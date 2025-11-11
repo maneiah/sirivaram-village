@@ -31,7 +31,7 @@ const galleryImages = [
   },
   {
     id: 5,
-    title: "Morning Prayers",
+    title: "Morning Vibes",
     category: "Spiritual Life",
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_eVEl-hIPIM1GwGkRZMT4N9RLXmTWiyuNSA&s",
