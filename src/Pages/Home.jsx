@@ -3,6 +3,7 @@ import React from "react";
 import Hero from "../components/Hero";
 import About from "../components/About";
 import Gallery from "../components/Gallery";
+import { Blog } from "../components/Blog";
 export default function Home() {
   return (
     <div className="bg-white">
@@ -11,6 +12,7 @@ export default function Home() {
      
       <About />
       <Gallery />
+      <Blog />
     </div>
   );
 }

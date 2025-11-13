@@ -41,7 +41,7 @@ const STATS = [
 const FeatureCard = memo(function FeatureCard({ icon, title, description }) {
   return (
     <article
-      className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+      className="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow border border-amber-100"
       aria-label={title}
     >
       <div className="text-4xl mb-4" aria-hidden="true">
@@ -110,13 +110,13 @@ const StatCard = memo(function StatCard({ value, label, suffix = "" }) {
   return (
     <div
       ref={ref}
-      className="bg-white p-4 md:p-6 rounded-lg text-center border-2 shadow-md border-violet-700/60"
+      className="bg-white p-4 md:p-6 rounded-lg text-center border-2 shadow-md border-amber-300/80"
     >
-      <p className="text-2xl md:text-3xl font-extrabold text-violet-800 tracking-tight">
+      <p className="text-2xl md:text-3xl font-extrabold text-amber-800 tracking-tight">
         {count}
         {suffix}
       </p>
-      <p className="text-sm md:text-base mt-2 text-violet-700/80">{label}</p>
+      <p className="text-sm md:text-base mt-2 text-amber-700/80">{label}</p>
     </div>
   );
 });
