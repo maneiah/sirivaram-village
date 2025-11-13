@@ -5,57 +5,51 @@ const galleryImages = [
     id: 1,
     title: "Temple Architecture",
     category: "Heritage",
-    image:
-      "https://www.google.com/url?sa=i&url=https%3A%2F%2Fpixels.com%2Ffeatured%2Fvillage-scene-in-warli-tribal-art-jey-manokaran.html%3Fproduct%3Dgreeting-card%26srsltid%3DAfmBOoqjVFVZe10XLBd9aUKbJ_hvOTFJreuUXdi5YYp237gkq7a1M988&psig=AOvVaw28kp5L58gV47Bwax0AM6b8&ust=1762968396048000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKDbrZ3P6pADFQAAAAAdAAAAABAE",
+    image: "https://i.ibb.co/wNWGjmhd/ORDER-RICE-ONLINE.png",
   },
+
   {
     id: 2,
     title: "Village Fields",
     category: "Agriculture",
-    image:
-      "https://www.google.com/url?sa=i&url=https%3A%2F%2Fpixels.com%2Ffeatured%2Fvillage-scene-in-warli-tribal-art-jey-manokaran.html%3Fproduct%3Dgreeting-card%26srsltid%3DAfmBOoqjVFVZe10XLBd9aUKbJ_hvOTFJreuUXdi5YYp237gkq7a1M988&psig=AOvVaw28kp5L58gV47Bwax0AM6b8&ust=1762968396048000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKDbrZ3P6pADFQAAAAAdAAAAABAE",
+    image: "https://i.ibb.co/F4jMpmXr/Groceries.png",
   },
   {
     id: 3,
     title: "Traditional Arts",
     category: "Culture",
-    image:
-      "https://www.google.com/url?sa=i&url=https%3A%2F%2Fpixels.com%2Ffeatured%2Fvillage-scene-in-warli-tribal-art-jey-manokaran.html%3Fproduct%3Dgreeting-card%26srsltid%3DAfmBOoqjVFVZe10XLBd9aUKbJ_hvOTFJreuUXdi5YYp237gkq7a1M988&psig=AOvVaw28kp5L58gV47Bwax0AM6b8&ust=1762968396048000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKDbrZ3P6pADFQAAAAAdAAAAABAE",
+    image: "https://i.ibb.co/mWQHvFT/Pets-ca3ab0d5bb314a9dc270.png",
   },
   {
     id: 4,
     title: "Festival Celebration",
     category: "Events",
     image:
-      "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.amazon.in%2FSamriddhi-Bullock-Cart-Village-Picture%2Fdp%2FB0D9NZWJKT&psig=AOvVaw28kp5L58gV47Bwax0AM6b8&ust=1762968396048000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKDbrZ3P6pADFQAAAAAdAAAAABAp",
+      "https://i.ibb.co/rRLB5P3q/Transportation-73d3a5de19f5bf0ab577-1.png",
   },
   {
     id: 5,
     title: "Morning Vibes",
     category: "Spiritual Life",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_eVEl-hIPIM1GwGkRZMT4N9RLXmTWiyuNSA&s",
+    image: "https://i.ibb.co/s9FMTHBk/Education-e7e8a28db21bea7913a2.png",
   },
   {
     id: 6,
     title: "Local Market",
     category: "Community",
-    image:
-      "https://images.unsplash.com/photo-1594040229653-c3d8f6c1225e?auto=format&fit=crop&w=900&q=80",
+    image: "https://i.ibb.co/fYLJPHMH/Food-Beverage-f6f559081d73ac0954f1.png",
   },
   {
     id: 7,
     title: "Cultural Dance",
     category: "Festivals",
-    image:
-      "https://images.unsplash.com/photo-1589187151053-5ec8818e6613?auto=format&fit=crop&w=900&q=80",
+    image: "https://i.ibb.co/MDRtFLkX/games-a8a1f4e472b2b491412b.png",
   },
   {
     id: 8,
     title: "Sunset Over Fields",
     category: "Nature",
-    image:
-      "https://images.unsplash.com/photo-1616249980459-08d3b1f8893e?auto=format&fit=crop&w=900&q=80",
+    image: "https://i.ibb.co/7JCGw842/legal-services-5638bd2fe81fef1e3ac4.png",
   },
 ];
 
