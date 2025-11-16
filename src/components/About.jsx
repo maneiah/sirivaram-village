@@ -126,7 +126,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50"
+      className="pt-20 px-4 sm:px-6 lg:px-8 bg-white"
       aria-labelledby="about-heading"
     >
       <div className="max-w-7xl mx-auto">

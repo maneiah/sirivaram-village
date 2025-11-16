@@ -67,7 +67,7 @@ export default function Gallery() {
   return (
     <section
       id="gallery"
-      className="py-20 px-4 sm:px-6 lg:px-8 bg-white"
+      className="pt-20 px-4 sm:px-6 lg:px-8 bg-white"
       aria-labelledby="gallery-heading"
     >
       <div className="max-w-7xl mx-auto">

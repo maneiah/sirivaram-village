@@ -7,7 +7,8 @@ import LoginPage from "./Auth/Login.jsx";
 import RegisterPage from "./Auth/Register.jsx";
 import AboutVillage from "./Pages/AboutVillage.jsx";
 import GalleryPage from "./Pages/allGalleryImages.jsx";
-
+import AOS from "aos";
+import "aos/dist/aos.css";
 // Handles scrolling to #about, #gallery, etc
 function ScrollToHash() {
   const location = useLocation();
@@ -29,7 +30,9 @@ function ScrollToHash() {
 
 function App() {
   const location = useLocation();
-
+useEffect(() => {
+  AOS.init({ duration: 900, once: true });
+}, []);
   // Scroll to top on normal route change (without hash)
   useEffect(() => {
     if (!location.hash) {
