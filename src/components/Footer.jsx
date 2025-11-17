@@ -3,7 +3,7 @@ import { Facebook, Instagram, Youtube, MessageCircle } from "lucide-react";
 import { FaWhatsappSquare } from "react-icons/fa";
 import { IoLogoYoutube } from "react-icons/io"; 
 
-
+import { Link } from "react-router-dom";
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -146,17 +146,17 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/login" className="hover:text-white transition-colors">
+                <Link  to="/login" className="hover:text-white transition-colors">
                   Login
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/register"
+                <Link
+                  to="/register"
                   className="hover:text-white transition-colors"
                 >
                   Register
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
