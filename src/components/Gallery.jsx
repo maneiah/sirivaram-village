@@ -10,56 +10,57 @@ const galleryImages = [
     title: "Temple Gopuram",
     category: "Heritage",
     image:
-      "https://images.pexels.com/photos/208485/pexels-photo-208485.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://t3.ftcdn.net/jpg/04/96/97/92/240_F_496979256_zYzs2iSkK3pRRjkRYk60kSxxhVPoukE8.jpg",
   },
   {
     id: 2,
     title: "Green Fields",
     category: "Nature",
     image:
-      "https://images.pexels.com/photos/2664029/pexels-photo-2664029.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://i.pinimg.com/736x/88/c4/b4/88c4b40afa5a1e7dc6a4daf922a5031b.jpg",
   },
   {
     id: 3,
     title: "Village Pathway",
     category: "Village Life",
     image:
-      "https://images.pexels.com/photos/2664029/pexels-photo-2664029.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.stockcake.com/public/8/8/2/882ac73a-c289-4020-a2ba-c7310f1d7105_large/rural-village-pathway-stockcake.jpg",
   },
   {
     id: 4,
     title: "Festival Lights",
     category: "Celebration",
     image:
-      "https://images.pexels.com/photos/1661900/pexels-photo-1661900.jpeg?auto=compress&cs=tinysrgb&w=800",
-  },
-  {
-    id: 5,
-    title: "Temple Gopuram",
-    category: "Heritage",
-    image:
-      "https://images.pexels.com/photos/208485/pexels-photo-208485.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://png.pngtree.com/thumb_back/fw800/background/20251005/pngtree-nighttime-village-celebration-with-fireworks-and-glowing-festive-lights-image_19765805.webp",
   },
   {
     id: 6,
-    title: "Green Fields",
+    title: "Misty Green Hills",
     category: "Nature",
     image:
-      "https://images.pexels.com/photos/2664029/pexels-photo-2664029.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80",
+  },
+
+  {
+    id: 6,
+    title: "Sunrise Over Green Fields",
+    category: "Nature",
+    image:
+      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: 7,
-    title: "Village Pathway",
+    title: "Rustic Village Walkway",
     category: "Village Life",
     image:
-      "https://images.pexels.com/photos/2664029/pexels-photo-2664029.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: 8,
-    title: "Festival Lights",
-    category: "Celebration",
+    title: "Peaceful Village Morning",
+    category: "Village Life",
     image:
-      "https://images.pexels.com/photos/1661900/pexels-photo-1661900.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS_vsKBih_smdN7JGM9KM5AG3iFRIuDXm7Yw&s",
   },
 ];
 
@@ -67,7 +68,7 @@ export default function Gallery() {
   return (
     <section
       id="gallery"
-      className="pt-20 px-4 sm:px-6 lg:px-8 bg-white"
+      className=" px-4 sm:px-6 lg:px-8 bg-white"
       aria-labelledby="gallery-heading"
     >
       <div className="max-w-7xl mx-auto">

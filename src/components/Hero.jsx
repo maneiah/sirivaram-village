@@ -13,17 +13,17 @@ const CAROUSEL_IMAGES = [
   },
   {
     id: 2,
-    url: "https://images.pexels.com/photos/161258/church-windmill-road-old-161258.jpeg",
+    url: "https://img.freepik.com/premium-photo/indian-agricultural-land-farming-indian-village-side_665346-17661.jpg",
     alt: "Village agricultural fields",
   },
   {
     id: 3,
-    url: "https://images.pexels.com/photos/33148790/pexels-photo-33148790.jpeg",
+    url: "https://thumbs.dreamstime.com/b/indian-traditional-house-tiled-roof-palm-trees-sunset-rustic-rural-architecture-rice-fields-scenic-landscape-maharashtra-385626684.jpg",
     alt: "Village traditional architecture",
   },
   {
     id: 4,
-    url: "https://images.pexels.com/photos/34699449/pexels-photo-34699449.jpeg",
+    url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzOc8vTZlKdo0GowZqmiCRza79TZWijWoojw&s",
     alt: "Village community gathering",
   },
 ];

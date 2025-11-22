@@ -31,7 +31,7 @@ function ScrollToHash() {
 function App() {
   const location = useLocation();
 useEffect(() => {
-  AOS.init({ duration: 900, once: true });
+  AOS.init({ duration: 900, once: false });
 }, []);
   // Scroll to top on normal route change (without hash)
   useEffect(() => {

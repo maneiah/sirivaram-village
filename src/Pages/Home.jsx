@@ -19,27 +19,32 @@ export default function Home() {
   if (loading) return <PageLoader />;
 
   return (
-    
     <div className="bg-white">
       {/* 1️⃣ Hero Section */}
-      <Hero data-aos="fade-up" />
-
+      <section id="hero">
+        <Hero data-aos="fade-up" />
+      </section>
       {/* 2️⃣ About Section */}
-      <About data-aos="fade-up" />
-
+      <section id="about">
+        <About data-aos="fade-up" />
+      </section>
       {/* 3️⃣ Gallery Section */}
-      <Gallery data-aos="fade-up" />
-
+      <section id="gallery">
+        <Gallery data-aos="fade-up" />
+      </section>
       {/* 4️⃣ Blog Section */}
-      <Blog data-aos="fade-up" />
-
+      <section id="blog">
+        <Blog data-aos="fade-up" />
+      </section>
       {/* 5️⃣ FAQ Section */}
-      <FaqWithImage data-aos="fade-up" />
-
+      <section>
+        <FaqWithImage data-aos="fade-up" />
+      </section>
       {/* 6️⃣ Contact Form Section */}
-      <GetInTouchSimple data-aos="fade-up" />
+      <section id="contact">
+        <GetInTouchSimple data-aos="fade-up" />
+      </section>
       <ScrollToTop />
-
     </div>
   );
 }

@@ -346,20 +346,30 @@ export default function Header() {
   const isOn = (path) => location.pathname === path;
 
 const smoothScroll = (e, sectionId) => {
-  if (location.pathname === "/") {
-    e.preventDefault();
-    const el = document.querySelector(sectionId);
-    if (el) {
-      const yOffset = -90; // header height offset
-      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+  e.preventDefault();
 
-      window.scrollTo({
-        top: y,
-        behavior: "smooth",
-      });
-    }
+  if (location.pathname !== "/") {
+    // 1️⃣ Navigate to home, then scroll
+    window.location.href = "/" + sectionId;
+    return;
+  }
+
+  // 2️⃣ Already on home → smooth scroll
+  const el = document.querySelector(sectionId);
+  if (el) {
+    const yOffset = -90; // Header offset
+    const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+    window.scrollTo({
+      top: y,
+      behavior: "smooth",
+    });
+
+    // 3️⃣ Update URL hash manually
+    window.history.replaceState(null, "", sectionId);
   }
 };
+
   return (
     <header
       className={`fixed w-full z-50 transition-all duration-300 ${
@@ -491,8 +501,6 @@ const smoothScroll = (e, sectionId) => {
             >
               Blogs
             </Link>
-
-            {/* CONTACT */}
             <Link
               to="/#contact"
               onClick={(e) => smoothScroll(e, "#contact")}

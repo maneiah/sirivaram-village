@@ -11,8 +11,6 @@ export default function GetInTouchSimple() {
   const [errors, setErrors] = useState({});
   const [responseData, setResponseData] = useState(null);
 
-  const themeColor = "#008cba"; // ONE COLOR USED EVERYWHERE
-
   const validate = () => {
     let newErrors = {};
 
@@ -44,30 +42,23 @@ export default function GetInTouchSimple() {
     setResponseData(apiResponse);
   };
 
-    return (
-      <section id="contact" className="pt-20 bg-white">
-        <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow">
-          <h2
-            className="text-3xl font-bold text-center mb-6 text-amber-800"
-         
-          >
+  return (
+    <section id="contact" className="w-full bg-white py-12 px-4">
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10">
+        {/* Left: Contact Form */}
+        <div className="bg-white p-8 rounded-xl shadow-lg border border-amber-200">
+          <h2 className="text-3xl font-bold text-center mb-6 text-amber-800">
             Get in touch
           </h2>
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="font-semibold text-amber-700" >
-                  Name
-                </label>
+                <label className="font-semibold text-amber-700">Name</label>
                 <input
                   type="text"
                   placeholder="Your name"
-                  className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2"
-                  style={{
-                    borderColor: themeColor,
-                    focusRingColor: themeColor,
-                  }}
+                  className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2 focus:ring-amber-500"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -79,17 +70,11 @@ export default function GetInTouchSimple() {
               </div>
 
               <div>
-                <label className="font-semibold text-amber-700" >
-                  Email
-                </label>
+                <label className="font-semibold text-amber-700">Email</label>
                 <input
                   type="email"
                   placeholder="Your email"
-                  className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2"
-                  style={{
-                    borderColor: themeColor,
-                    focusRingColor: themeColor,
-                  }}
+                  className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2 focus:ring-amber-500"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
@@ -102,14 +87,11 @@ export default function GetInTouchSimple() {
             </div>
 
             <div className="mt-4">
-              <label className="font-semibold text-amber-700" >
-                Subject
-              </label>
+              <label className="font-semibold text-amber-700">Subject</label>
               <input
                 type="text"
                 placeholder="Subject"
-                className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2"
-                style={{ borderColor: themeColor }}
+                className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2 focus:ring-amber-500"
                 value={formData.subject}
                 onChange={(e) =>
                   setFormData({ ...formData, subject: e.target.value })
@@ -121,14 +103,11 @@ export default function GetInTouchSimple() {
             </div>
 
             <div className="mt-4">
-              <label className="font-semibold text-amber-700">
-                Message
-              </label>
+              <label className="font-semibold text-amber-700">Message</label>
               <textarea
                 placeholder="Your message"
                 rows="5"
-                className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2"
-                style={{ borderColor: themeColor }}
+                className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2 focus:ring-amber-500"
                 value={formData.message}
                 onChange={(e) =>
                   setFormData({ ...formData, message: e.target.value })
@@ -139,8 +118,7 @@ export default function GetInTouchSimple() {
             <div className="flex justify-center mt-6">
               <button
                 type="submit"
-                className="px-6 py-3 rounded bg-amber-700 text-white rounded-lg  text-white font-semibold"
-                // style={{ backgroundColor: themeColor }}
+                className="px-8 py-3 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg shadow-md transition-all"
               >
                 Send Message
               </button>
@@ -148,22 +126,27 @@ export default function GetInTouchSimple() {
           </form>
 
           {responseData && (
-            <div
-              className="mt-6 p-4 rounded"
-              style={{
-                border: `1px solid ${themeColor}`,
-                backgroundColor: "#e6f7fb",
-              }}
-            >
-              <h3 className="font-bold" style={{ color: themeColor }}>
-                Response Received:
-              </h3>
+            <div className="mt-6 p-4 rounded border border-amber-500 bg-amber-50">
+              <h3 className="font-bold text-amber-700">Response Received:</h3>
               <pre className="text-sm mt-2 text-gray-800">
                 {JSON.stringify(responseData, null, 2)}
               </pre>
             </div>
           )}
         </div>
-      </section>
-    );
+
+        {/* Right: Google Map */}
+        <div className="w-full h-[350px] md:h-[450px] lg:h-full rounded-xl overflow-hidden shadow-lg border border-amber-200">
+          <iframe
+            title="Sirivaram Village Map"
+            className="w-full h-full"
+            loading="lazy"
+            allowFullScreen
+            referrerPolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3925.6153209192997!2d79.2524203!3d14.3333207!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bb33138ba7d259f%3A0x1be9a432970e93d3!2sSirivaram%2C%20Andhra%20Pradesh%20516127!5e0!3m2!1sen!2sin!4v1700000000000"
+          ></iframe>
+        </div>
+      </div>
+    </section>
+  );
 }

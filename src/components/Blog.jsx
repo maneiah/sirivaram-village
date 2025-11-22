@@ -3,7 +3,7 @@ import React from "react";
 
 export const Blog = () => {
   return (
-    <section id="blog" className=" pt-20 bg-white">
+    <section id="blog" className=" bg-white">
       <div className="px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20">
         {/* Heading */}
         <div className="max-w-xl mb-10 md:mx-auto text-center">
@@ -21,7 +21,7 @@ export const Blog = () => {
           {/* Card 1 */}
           <div className="overflow-hidden transition-shadow duration-300 bg-white rounded-2xl shadow-sm border border-amber-100">
             <img
-              src="https://images.pexels.com/photos/208485/pexels-photo-208485.jpeg?auto=compress&cs=tinysrgb&w=800"
+              src="https://lepakshitemple.in/wp-content/uploads/2023/10/lepakshi-nandi-basavanna.webp"
               className="object-cover w-full h-64"
               alt="Temple and heritage"
             />
@@ -46,7 +46,7 @@ export const Blog = () => {
           {/* Card 2 */}
           <div className="overflow-hidden transition-shadow duration-300 bg-white rounded-2xl shadow-sm border border-amber-100">
             <img
-              src="https://images.pexels.com/photos/208485/pexels-photo-208485.jpeg?auto=compress&cs=tinysrgb&w=800"
+              src="https://i.pinimg.com/736x/5c/4c/21/5c4c21f0d0240f4039c1f2d42e94eb6d.jpg"
               className="object-cover w-full h-64"
               alt="Fields and nature"
             />
@@ -71,7 +71,7 @@ export const Blog = () => {
           {/* Card 3 */}
           <div className="overflow-hidden transition-shadow duration-300 bg-white rounded-2xl shadow-sm border border-amber-100">
             <img
-              src="https://images.pexels.com/photos/1661900/pexels-photo-1661900.jpeg?auto=compress&cs=tinysrgb&w=800"
+              src="https://discovery.sndimg.com/content/dam/images/discovery/fullset/2020/11/10/GettyImages-619276504.jpg.rend.hgtvcom.1280.960.suffix/1605080589671.jpeg"
               className="object-cover w-full h-64"
               alt="Festival celebration"
             />
