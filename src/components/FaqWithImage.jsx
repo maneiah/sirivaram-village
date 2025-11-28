@@ -4,95 +4,92 @@ import image from "../assets/image.b0c2306b.png";
 
 export default function FaqWithImage() {
   return (
-    <>
-      {/* INLINE CSS */}
-      <style>{`
-        .faq-wrapper {
-          padding-top: calc(var(--mantine-spacing-xl) * 2);
-          padding-bottom: calc(var(--mantine-spacing-xl) * 2);
-        }
+    <section
+      id="faq"
+      aria-label="Frequently Asked Questions about Sirivaram Village"
+      className="py-16 bg-gray-50"
+    >
+      <Container size="lg">
+        <Grid gutter={50}>
+          {/* Left Image */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Image
+              src={image}
+              alt="Sirivaram Village FAQs"
+              radius="md"
+              withPlaceholder
+            />
+          </Grid.Col>
 
-        .faq-title {
-          margin-bottom: var(--mantine-spacing-md);
-          padding-left: var(--mantine-spacing-md);
-          color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-          font-family: Outfit, var(--mantine-font-family);
-          font-weight: 500;
-        }
+          {/* Right FAQ */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Title
+              order={2}
+              className="mb-6 text-2xl font-semibold text-amber-900"
+            >
+              Frequently Asked Questions (Sirivaram Village)
+            </Title>
 
-        .faq-item {
-          font-size: var(--mantine-font-size-sm);
-          color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-1));
-        }
-      `}</style>
+            <Accordion
+              chevronPosition="right"
+              defaultValue="location"
+              variant="separated"
+            >
+              <Accordion.Item value="location">
+                <Accordion.Control>
+                  Where is Sirivaram located?
+                </Accordion.Control>
+                <Accordion.Panel>
+                  Sirivaram village is located in <b>Penagalur Mandal</b>,{" "}
+                  <b>Kadapa District</b>, Andhra Pradesh. It falls under{" "}
+                  <b>Kodur Panchayathi</b> and is near the town of{" "}
+                  <b>Rajampet</b>.
+                </Accordion.Panel>
+              </Accordion.Item>
 
-      {/* FAQ SECTION */}
-      <div className="faq-wrapper">
-        <Container size="lg">
-          <Grid gutter={50}>
-            {/* Left Image */}
-            <Grid.Col span={{ base: 12, md: 6 }}>
-              <Image src={image} alt="Sirivaram FAQ" />
-            </Grid.Col>
+              <Accordion.Item value="pincode">
+                <Accordion.Control>
+                  What is the pincode of Sirivaram?
+                </Accordion.Control>
+                <Accordion.Panel>
+                  The pincode for Sirivaram village is <b>516271</b>.
+                </Accordion.Panel>
+              </Accordion.Item>
 
-            {/* Right FAQ */}
-            <Grid.Col span={{ base: 12, md: 6 }}>
-              <Title order={2} ta="left" className="faq-title">
-                Frequently Asked Questions (Sirivaram)
-              </Title>
+              <Accordion.Item value="population">
+                <Accordion.Control>
+                  What is the population of Sirivaram?
+                </Accordion.Control>
+                <Accordion.Panel>
+                  As per the 2011 Census, Sirivaram has a population of{" "}
+                  <b>720</b> people.
+                </Accordion.Panel>
+              </Accordion.Item>
 
-              <Accordion
-                chevronPosition="right"
-                defaultValue="location"
-                variant="separated"
-              >
-                {/* Q1 */}
-                <Accordion.Item className="faq-item" value="location">
-                  <Accordion.Control>
-                    Where is Sirivaram located?
-                  </Accordion.Control>
-                  <Accordion.Panel>
-                    Sirivaram village is located in Penagalur Mandal, YSR
-                    district, Andhra Pradesh.
-                  </Accordion.Panel>
-                </Accordion.Item>
+              <Accordion.Item value="literacy">
+                <Accordion.Control>
+                  What is the literacy rate in Sirivaram?
+                </Accordion.Control>
+                <Accordion.Panel>
+                  The overall literacy rate in Sirivaram is <b>41.39%</b>{" "}
+                  according to 2011 Census data.
+                </Accordion.Panel>
+              </Accordion.Item>
 
-                {/* Q2 */}
-                <Accordion.Item className="faq-item" value="pincode">
-                  <Accordion.Control>
-                    What is the pincode of Sirivaram?
-                  </Accordion.Control>
-                  <Accordion.Panel>
-                    The pincode for Sirivaram village is <b>516271</b>.
-                  </Accordion.Panel>
-                </Accordion.Item>
-
-                {/* Q3 */}
-                <Accordion.Item className="faq-item" value="population">
-                  <Accordion.Control>
-                    What is the population of Sirivaram?
-                  </Accordion.Control>
-                  <Accordion.Panel>
-                    As per the 2011 Census, Sirivaram has a population of{" "}
-                    <b>720</b> people.
-                  </Accordion.Panel>
-                </Accordion.Item>
-
-                {/* Q4 */}
-                <Accordion.Item className="faq-item" value="literacy">
-                  <Accordion.Control>
-                    What is the literacy rate in Sirivaram?
-                  </Accordion.Control>
-                  <Accordion.Panel>
-                    The overall literacy rate in Sirivaram is <b>41.39%</b>,
-                    based on 2011 Census data.
-                  </Accordion.Panel>
-                </Accordion.Item>
-              </Accordion>
-            </Grid.Col>
-          </Grid>
-        </Container>
-      </div>
-    </>
+              <Accordion.Item value="temple">
+                <Accordion.Control>
+                  What temples are there in Sirivaram?
+                </Accordion.Control>
+                <Accordion.Panel>
+                  Sirivaram is famous for its <b>ancient Lord Shiva Temple</b>{" "}
+                  and other small local temples. These temples host festivals
+                  like <b>Shivaratri</b> and <b>Deepavali</b>.
+                </Accordion.Panel>
+              </Accordion.Item>
+            </Accordion>
+          </Grid.Col>
+        </Grid>
+      </Container>
+    </section>
   );
 }

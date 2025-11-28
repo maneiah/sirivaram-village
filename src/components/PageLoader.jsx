@@ -2,24 +2,11 @@ import React from "react";
 
 export default function PageLoader() {
   return (
-    <div className="loader-container">
-      <div className="gradient-loader"></div>
+    <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+      <div className="loader" aria-label="Loading content..."></div>
 
       <style>{`
-        .loader-container {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: #ffffff;
-          z-index: 9999;
-        }
-
-        .gradient-loader {
+        .loader {
           width: 70px;
           height: 70px;
           border-radius: 50%;
@@ -35,9 +22,8 @@ export default function PageLoader() {
         }
 
         @keyframes glow {
-          0% { filter: drop-shadow(0 0 2px #008cba); }
+          0%, 100% { filter: drop-shadow(0 0 2px #008cba); }
           50% { filter: drop-shadow(0 0 10px #008cba); }
-          100% { filter: drop-shadow(0 0 2px #008cba); }
         }
       `}</style>
     </div>

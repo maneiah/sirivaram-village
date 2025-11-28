@@ -43,19 +43,26 @@ export default function GetInTouchSimple() {
   };
 
   return (
-    <section id="contact" className="w-full bg-white py-12 px-4">
+    <section
+      id="contact"
+      aria-label="Contact Sirivaram Village"
+      className="w-full bg-white py-16 px-4"
+    >
       <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10">
         {/* Left: Contact Form */}
         <div className="bg-white p-8 rounded-xl shadow-lg border border-amber-200">
           <h2 className="text-3xl font-bold text-center mb-6 text-amber-800">
-            Get in touch
+            Get in touch with Sirivaram Village
           </h2>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="font-semibold text-amber-700">Name</label>
+                <label htmlFor="name" className="font-semibold text-amber-700">
+                  Name
+                </label>
                 <input
+                  id="name"
                   type="text"
                   placeholder="Your name"
                   className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2 focus:ring-amber-500"
@@ -63,6 +70,7 @@ export default function GetInTouchSimple() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
+                  required
                 />
                 {errors.name && (
                   <p className="text-red-600 text-sm">{errors.name}</p>
@@ -70,8 +78,11 @@ export default function GetInTouchSimple() {
               </div>
 
               <div>
-                <label className="font-semibold text-amber-700">Email</label>
+                <label htmlFor="email" className="font-semibold text-amber-700">
+                  Email
+                </label>
                 <input
+                  id="email"
                   type="email"
                   placeholder="Your email"
                   className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2 focus:ring-amber-500"
@@ -79,6 +90,7 @@ export default function GetInTouchSimple() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
+                  required
                 />
                 {errors.email && (
                   <p className="text-red-600 text-sm">{errors.email}</p>
@@ -87,8 +99,11 @@ export default function GetInTouchSimple() {
             </div>
 
             <div className="mt-4">
-              <label className="font-semibold text-amber-700">Subject</label>
+              <label htmlFor="subject" className="font-semibold text-amber-700">
+                Subject
+              </label>
               <input
+                id="subject"
                 type="text"
                 placeholder="Subject"
                 className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2 focus:ring-amber-500"
@@ -96,6 +111,7 @@ export default function GetInTouchSimple() {
                 onChange={(e) =>
                   setFormData({ ...formData, subject: e.target.value })
                 }
+                required
               />
               {errors.subject && (
                 <p className="text-red-600 text-sm">{errors.subject}</p>
@@ -103,8 +119,11 @@ export default function GetInTouchSimple() {
             </div>
 
             <div className="mt-4">
-              <label className="font-semibold text-amber-700">Message</label>
+              <label htmlFor="message" className="font-semibold text-amber-700">
+                Message
+              </label>
               <textarea
+                id="message"
                 placeholder="Your message"
                 rows="5"
                 className="w-full bg-gray-100 p-3 rounded mt-1 outline-none focus:ring-2 focus:ring-amber-500"
@@ -128,9 +147,9 @@ export default function GetInTouchSimple() {
           {responseData && (
             <div className="mt-6 p-4 rounded border border-amber-500 bg-amber-50">
               <h3 className="font-bold text-amber-700">Response Received:</h3>
-              <pre className="text-sm mt-2 text-gray-800">
-                {JSON.stringify(responseData, null, 2)}
-              </pre>
+              <p className="text-sm mt-2 text-gray-800">
+                {responseData.message}
+              </p>
             </div>
           )}
         </div>

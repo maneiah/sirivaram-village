@@ -7,56 +7,57 @@ export default function AboutVillage() {
     {
       title: "Ancient Shiva Temple",
       description:
-        "A 500-year-old temple dedicated to Lord Shiva, featuring intricate stone carvings and spiritual importance.",
-      icon: "🏛️",
+        "Sirivaram’s famous Lord Shiva Temple is over 500 years old, known for its spiritual importance, stone architecture, and heritage value.",
+      icon: "🛕",
     },
     {
       title: "Agricultural Heritage",
       description:
-        "Sirivaram is known for its rich agricultural traditions and organic farming practices passed down through generations.",
+        "Located in Kadapa District, Sirivaram is known for rice, groundnut, and redgram farming with traditional irrigation methods.",
       icon: "🌾",
     },
     {
       title: "Cultural Festivals",
       description:
-        "Experience vibrant festivals like Shivaratri, Diwali, and Makar Sankranti celebrated with traditional rituals.",
+        "Shivaratri, Ugadi, Sankranti, and Deepawali are celebrated grandly with community gatherings, rituals, and traditional games.",
       icon: "🎉",
     },
     {
-      title: "Local Craftsmanship",
+      title: "Local Panchayathi",
       description:
-        "Discover traditional handicrafts, pottery, and weaving that showcase the artistic skills of local artisans.",
-      icon: "🎨",
+        "Sirivaram comes under Kodur Panchayathi in Penagalur Mandal, ensuring local governance, development programs, and welfare activities.",
+      icon: "🏢",
     },
     {
       title: "Spiritual Practices",
       description:
-        "Learn about meditation, yoga, and ancient spiritual practices rooted in Hindu traditions.",
+        "Daily poojas, bhajans, meditation gatherings, and yearly temple festivals keep spiritual traditions alive in the village.",
       icon: "🧘",
     },
     {
-      title: "Community Service",
+      title: "Village Community",
       description:
-        "Sirivaram's community is dedicated to social welfare, education, and cultural preservation initiatives.",
-      icon: "❤️",
+        "A peaceful and united community that participates in welfare activities, temple celebrations, and cultural preservation.",
+      icon: "🤝",
     },
     {
       title: "Natural Beauty",
       description:
-        "Surrounded by lush greenery, scenic landscapes, and serene water bodies perfect for nature lovers.",
+        "Surrounded by greenery, farmland, and scenic hill views — the village offers a calm and refreshing environment.",
       icon: "🌿",
     },
     {
-      title: "Heritage Conservation",
+      title: "Location Advantage",
       description:
-        "Active efforts in preserving historical structures, traditions, and the village's cultural identity.",
-      icon: "🏺",
+        "Sirivaram is located near Rajampet town, making it easily accessible while retaining its traditional rural charm.",
+      icon: "📍",
     },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 pt-32 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
+        {/* Breadcrumb */}
         <div className="mb-12">
           <Link
             to="/"
@@ -65,14 +66,19 @@ export default function AboutVillage() {
             ← Back to Home
           </Link>
           <h1 className="text-5xl font-bold text-amber-900 mb-4">
-            Discover Sirivaram
+            Discover Sirivaram Village
           </h1>
-          <p className="text-xl text-gray-600">
-            A comprehensive look at the heritage, culture, and traditions of our
-            beautiful village.
+          <p className="text-xl text-gray-600 leading-relaxed">
+            Sirivaram Village, located in <strong>Penagalur Mandal</strong>,
+            <strong> Kadapa District</strong>, under{" "}
+            <strong>Kodur Panchayathi</strong>, is known for its ancient
+            temples, rich agriculture, spiritual traditions, and strong cultural
+            heritage. The village is also conveniently located near{" "}
+            <strong>Rajampet town</strong>.
           </p>
         </div>
 
+        {/* Cards Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {villageCards.map((card, index) => (
             <div

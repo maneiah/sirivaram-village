@@ -1,21 +1,22 @@
 import React from "react";
-import { Facebook, Instagram, Youtube, MessageCircle } from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
 import { FaWhatsappSquare } from "react-icons/fa";
-import { IoLogoYoutube } from "react-icons/io"; 
-
+import { IoLogoYoutube } from "react-icons/io";
 import { Link } from "react-router-dom";
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
+
   return (
-    <footer className="bg-amber-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+    <footer className="bg-amber-900 text-white py-12 px-4 sm:px-6 lg:px-8 relative">
       <div className="max-w-7xl mx-auto">
         {/* Top grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Logo / Brand */}
           <div>
             <div className="w-14 h-14 rounded-xl bg-amber-800 flex items-center justify-center p-2 shadow-sm">
-              {/* Village SVG ICON */}
+              {/* Village SVG Icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 350 350"
@@ -92,7 +93,7 @@ export default function Footer() {
               </svg>
             </div>
 
-            <h3 className="font-bold text-lg tracking-wide mt-3">Sirivaram</h3>
+            <h2 className="font-bold text-lg tracking-wide mt-3">Sirivaram</h2>
             <p className="text-amber-100 text-sm mt-2 leading-relaxed">
               Preserving heritage, celebrating culture and welcoming devotees
               and visitors to our village temple.
@@ -101,9 +102,9 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold mb-4 text-amber-50 text-sm uppercase tracking-wide">
+            <h2 className="font-semibold mb-4 text-amber-50 text-sm uppercase tracking-wide">
               Quick Links
-            </h4>
+            </h2>
             <ul className="space-y-2 text-amber-100 text-sm">
               <li>
                 <a
@@ -146,7 +147,10 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <Link  to="/login" className="hover:text-white transition-colors">
+                <Link
+                  to="/login"
+                  className="hover:text-white transition-colors"
+                >
                   Login
                 </Link>
               </li>
@@ -163,37 +167,32 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-4 text-amber-50 text-sm uppercase tracking-wide">
+            <h2 className="font-semibold mb-4 text-amber-50 text-sm uppercase tracking-wide">
               Contact
-            </h4>
-            <ul className="space-y-2 text-amber-100 text-sm leading-relaxed">
-              <li>
-                <span className="font-medium text-amber-50">Email:</span>{" "}
+            </h2>
+            <address className="not-italic text-amber-100 text-sm leading-relaxed">
+              Email:{" "}
+              <a href="mailto:sirivaram@gmail.com" className="hover:underline">
                 sirivaram@gmail.com
-              </li>
-              <li>
-                <span className="font-medium text-amber-50">Phone:</span> +91
-                70934 85208
-              </li>
-              <li>
-                <span className="font-medium text-amber-50">Address:</span>{" "}
-                Sirivaram Village, Penagaluru Mandal,
-                <br />
-                Annamayya District, Andhra Pradesh
-              </li>
-            </ul>
+              </a>
+              <br />
+              Phone: +91 70934 85208
+              <br />
+              Address: Sirivaram Village, Penagaluru Mandal,
+              <br />
+              Annamayya District, Andhra Pradesh
+            </address>
           </div>
 
           {/* Social Icons */}
           <div>
-            <h4 className="font-semibold mb-4 text-amber-50 text-sm uppercase tracking-wide">
+            <h2 className="font-semibold mb-4 text-amber-50 text-sm uppercase tracking-wide">
               Follow Us
-            </h4>
+            </h2>
             <p className="text-amber-100 text-sm mb-3">
               Stay connected with updates, events and stories from Sirivaram.
             </p>
             <div className="flex gap-3">
-              {/* Facebook */}
               <a
                 href="https://facebook.com"
                 target="_blank"
@@ -203,8 +202,6 @@ export default function Footer() {
               >
                 <Facebook className="w-5 h-5 text-white" />
               </a>
-
-              {/* Instagram */}
               <a
                 href="https://instagram.com"
                 target="_blank"
@@ -218,8 +215,6 @@ export default function Footer() {
               >
                 <Instagram className="w-5 h-5 text-white" />
               </a>
-
-              {/* WhatsApp */}
               <a
                 href="https://wa.me/917093485208"
                 target="_blank"
@@ -229,8 +224,6 @@ export default function Footer() {
               >
                 <FaWhatsappSquare className="w-5 h-5 text-white" />
               </a>
-
-              {/* YouTube */}
               <a
                 href="https://youtube.com"
                 target="_blank"
@@ -244,12 +237,48 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Back to Top Button */}
+     
+
         {/* Bottom line */}
-        <div className="border-t border-amber-800 pt-6 mt-4">
+        <div className="border-t border-amber-800 pt-6 mt-6">
           <p className="text-center text-amber-100 text-xs sm:text-sm">
             © {currentYear} Sirivaram Village. All rights reserved.
           </p>
         </div>
+
+        {/* JSON-LD Organization Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Sirivaram Village",
+              url: "https://sirivaram-village.vercel.app",
+              logo: "https://sirivaram-village.vercel.app/favicon.png",
+              sameAs: [
+                "https://facebook.com",
+                "https://instagram.com",
+                "https://wa.me/917093485208",
+                "https://youtube.com",
+              ],
+              contactPoint: {
+                "@type": "ContactPoint",
+                email: "sirivaram@gmail.com",
+                telephone: "+91 70934 85208",
+                contactType: "customer support",
+              },
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: "Sirivaram Village, Penagaluru Mandal",
+                addressLocality: "Sirivaram",
+                addressRegion: "Annamayya District",
+                addressCountry: "IN",
+              },
+            }),
+          }}
+        />
       </div>
     </footer>
   );
