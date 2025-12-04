@@ -1,15 +1,18 @@
 // src/App.jsx
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense, lazy } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import RootLayout from "./layouts/RootLayout.jsx";
-import Home from "./Pages/Home.jsx";
-import LoginPage from "./Auth/Login.jsx";
-import RegisterPage from "./Auth/Register.jsx";
-import AboutVillage from "./Pages/AboutVillage.jsx";
-import GalleryPage from "./Pages/allGalleryImages.jsx";
 import AOS from "aos";
 import "aos/dist/aos.css";
-// Handles scrolling to #about, #gallery, etc
+
+// Lazy-loaded pages
+const Home = lazy(() => import("./Pages/Home.jsx"));
+const LoginPage = lazy(() => import("./Auth/Login.jsx"));
+const RegisterPage = lazy(() => import("./Auth/Register.jsx"));
+const AboutVillage = lazy(() => import("./Pages/AboutVillage.jsx"));
+const GalleryPage = lazy(() => import("./Pages/allGalleryImages.jsx"));
+
+// Scroll to #hash (anchors)
 function ScrollToHash() {
   const location = useLocation();
 
@@ -30,10 +33,12 @@ function ScrollToHash() {
 
 function App() {
   const location = useLocation();
-useEffect(() => {
-  AOS.init({ duration: 900, once: false });
-}, []);
-  // Scroll to top on normal route change (without hash)
+
+  useEffect(() => {
+    AOS.init({ duration: 900, once: false });
+  }, []);
+
+  // Scroll to top if no hash exists
   useEffect(() => {
     if (!location.hash) {
       window.scrollTo(0, 0);
@@ -43,16 +48,19 @@ useEffect(() => {
   return (
     <>
       <ScrollToHash />
-      <Routes>
-        {/* Layout with shared Header & Footer */}
-        <Route element={<RootLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/about-village" element={<AboutVillage />} />
-          <Route path="/gallery" element={<GalleryPage />} />
-        </Route>
-      </Routes>
+
+      {/* Suspense fallback loader */}
+      <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
+        <Routes>
+          <Route element={<RootLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/about-village" element={<AboutVillage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </>
   );
 }
