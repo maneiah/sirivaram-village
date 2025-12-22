@@ -15,22 +15,22 @@
     />
     <meta name="author" content="Sirivaram Official" />
 
-    <!-- Canonical URL for Google -->
+    <!-- Canonical -->
     <link rel="canonical" href="https://sirivaram-village.vercel.app/" />
 
-    <!-- Responsive Viewport -->
+    <!-- Viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Theme Color -->
+    <!-- Theme -->
     <meta name="theme-color" content="#92400E" />
 
-    <!-- Local SEO Identity Tags -->
+    <!-- Geo -->
     <meta name="geo.region" content="IN-AP" />
     <meta name="geo.placename" content="Sirivaram Village, Kadapa District" />
     <meta name="geo.position" content="14.1833;79.1667" />
     <meta name="ICBM" content="14.1833, 79.1667" />
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph -->
     <meta property="og:title" content="Sirivaram Village – Temple, Culture & Heritage | Kadapa District" />
     <meta
       property="og:description"
@@ -40,7 +40,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://sirivaram-village.vercel.app/" />
 
-    <!-- Twitter Meta Tags -->
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Sirivaram Village – Kadapa District | Temple & Culture" />
     <meta
@@ -49,56 +49,373 @@
     />
     <meta name="twitter:image" content="/sirivaram-cover.jpg" />
 
-    <!-- Performance & Speed Recommendations -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Add if you use any Google Fonts -->
-
     <!-- Favicons -->
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
 
-    <!-- Sitemap Link ( helps Google indexing ) -->
+    <!-- Sitemap -->
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 
-    <!-- Robots (Important for Search Indexing) -->
+    <!-- Robots -->
     <meta name="robots" content="index, follow" />
 
-    <!-- Vite Script -->
+    <!-- Vite Entry -->
     <script type="module" src="/src/main.jsx"></script>
-      <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Place",
-    "name": "Sirivaram Village",
-    "description": "Sirivaram Village located in Penagalur Mandal, Kadapa District, Andhra Pradesh. Famous for culture, temples, festivals and heritage.",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Sirivaram",
-      "addressRegion": "Kadapa District",
-      "addressCountry": "India"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": "14.083",
-      "longitude": "79.166"
-    },
-    "url": "https://sirivaram-village.vercel.app",
-    "image": "https://sirivaram-village.vercel.app/sirivaram-cover.jpg"
-  }
-  </script>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DXJWS32JTS"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-DXJWS32JTS');
-</script>
+    <!-- Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Place",
+        "name": "Sirivaram Village",
+        "description": "Sirivaram Village located in Penagalur Mandal, Kadapa District, Andhra Pradesh.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Sirivaram",
+          "addressRegion": "Kadapa District",
+          "addressCountry": "India"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "14.083",
+          "longitude": "79.166"
+        },
+        "url": "https://sirivaram-village.vercel.app",
+        "image": "https://sirivaram-village.vercel.app/sirivaram-cover.jpg"
+      }
+    </script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DXJWS32JTS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", "G-DXJWS32JTS");
+    </script>
   </head>
 
   <body>
     <div id="root"></div>
+
+    <!-- ✅ CHATBASE (FINAL & WORKING) -->
+  <script>
+  (function () {
+    if (window.__SIRIVARAM_CHAT_WIDGET__) return;
+    window.__SIRIVARAM_CHAT_WIDGET__ = true;
+
+    const BOT_URL =
+      "https://www.askoxy.ai/asst_fmECAe12SDciat7LnfgcvPpJ/d47e658e-0da5-4279-82f6-64fe3d7c8102/Abrigo";
+
+    // Sirivaram Theme (matches Tailwind amber shades)
+    const THEME = {
+      amber700: "#B45309", // tailwind amber-700
+      amber800: "#92400E", // tailwind amber-800
+      amber900: "#78350F", // tailwind amber-900
+      slate900: "#0F172A",
+      border: "rgba(15, 23, 42, 0.14)",
+      shadowPanel: "0 18px 50px rgba(2, 6, 23, 0.22)",
+      shadowBtn: "0 14px 34px rgba(2, 6, 23, 0.28)",
+    };
+
+    const GAP = 16;
+    const BTN = 56;
+    const DESKTOP_W = 390;
+    const DESKTOP_H = 580;
+    const HEADER_H = 54;
+
+    // Inject CSS
+    const style = document.createElement("style");
+    style.textContent = `
+      #sirivaram-chat-root {
+        position: fixed;
+        right: ${GAP}px;
+        bottom: ${GAP}px;
+        z-index: 2147483000;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      }
+
+      #sirivaram-chat-btn {
+        width: ${BTN}px;
+        height: ${BTN}px;
+        border-radius: 999px;
+        border: 1px solid ${THEME.border};
+        background: ${THEME.amber700};
+        color: #fff;
+        cursor: pointer;
+        box-shadow: ${THEME.shadowBtn};
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      }
+
+      #sirivaram-chat-btn:hover {
+        background: ${THEME.amber800};
+        transform: translateY(-1px);
+        box-shadow: 0 18px 44px rgba(2,6,23,.34);
+      }
+
+      #sirivaram-chat-btn:active {
+        transform: translateY(0px) scale(0.98);
+      }
+
+      #sirivaram-chat-panel {
+        position: absolute;
+        right: 0;
+        bottom: ${BTN + 12}px;
+        width: ${DESKTOP_W}px;
+        height: ${DESKTOP_H}px;
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid ${THEME.border};
+        box-shadow: ${THEME.shadowPanel};
+        transform: translateY(10px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .18s ease, transform .18s ease;
+      }
+
+      #sirivaram-chat-panel[data-open="true"] {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+
+      #sirivaram-chat-header {
+        height: ${HEADER_H}px;
+        background: linear-gradient(135deg, ${THEME.amber900}, ${THEME.amber700});
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 12px;
+        box-sizing: border-box;
+      }
+
+      #sirivaram-chat-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      #sirivaram-chat-title h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: .2px;
+      }
+
+      #sirivaram-chat-title p {
+        margin: 0;
+        font-size: 12px;
+        opacity: .88;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      #sirivaram-chat-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,.22);
+        background: rgba(255,255,255,.12);
+        color: #fff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background .15s ease, transform .15s ease;
+      }
+
+      #sirivaram-chat-close:hover {
+        background: rgba(255,255,255,.18);
+        transform: translateY(-1px);
+      }
+
+      #sirivaram-chat-iframeWrap {
+        width: 100%;
+        height: calc(100% - ${HEADER_H}px);
+        background: #fff;
+      }
+
+      #sirivaram-chat-iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+
+      /* ✅ Responsive for all devices */
+      @media (max-width: 520px) {
+        #sirivaram-chat-root { right: 12px; bottom: 12px; }
+        #sirivaram-chat-panel {
+          width: calc(100vw - 24px);
+          height: min(78vh, 680px);
+          border-radius: 18px;
+        }
+      }
+
+      @media (max-width: 360px) {
+        #sirivaram-chat-panel { height: min(80vh, 640px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Root
+    const root = document.createElement("div");
+    root.id = "sirivaram-chat-root";
+
+    // Panel
+    const panel = document.createElement("div");
+    panel.id = "sirivaram-chat-panel";
+    panel.setAttribute("data-open", "false");
+
+    // Header
+    const header = document.createElement("div");
+    header.id = "sirivaram-chat-header";
+
+    const titleWrap = document.createElement("div");
+    titleWrap.id = "sirivaram-chat-title";
+
+    // Small temple-style icon (SVG)
+    const mark = document.createElement("div");
+    mark.style.width = "30px";
+    mark.style.height = "30px";
+    mark.style.borderRadius = "10px";
+    mark.style.background = "rgba(255,255,255,0.16)";
+    mark.style.display = "flex";
+    mark.style.alignItems = "center";
+    mark.style.justifyContent = "center";
+    mark.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3l4 4v3H8V7l4-4Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M6 10h12v10H6V10Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M10 20v-5h4v5" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    `;
+
+    const textBlock = document.createElement("div");
+    textBlock.style.minWidth = "0";
+
+    const h4 = document.createElement("h4");
+    h4.textContent = "Sirivaram Assistant";
+
+    const p = document.createElement("p");
+    p.textContent = "Temple • Culture • Village Info";
+
+    textBlock.appendChild(h4);
+    textBlock.appendChild(p);
+
+    titleWrap.appendChild(mark);
+    titleWrap.appendChild(textBlock);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.id = "sirivaram-chat-close";
+    closeBtn.type = "button";
+    closeBtn.setAttribute("aria-label", "Close chat");
+    closeBtn.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M6 6l12 12M18 6 6 18" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+
+    header.appendChild(titleWrap);
+    header.appendChild(closeBtn);
+
+    // Iframe
+    const iframeWrap = document.createElement("div");
+    iframeWrap.id = "sirivaram-chat-iframeWrap";
+
+    const iframe = document.createElement("iframe");
+    iframe.id = "sirivaram-chat-iframe";
+    iframe.title = "Sirivaram Chatbot";
+    iframe.src = BOT_URL;
+    iframe.allow = "microphone; clipboard-write";
+
+    iframeWrap.appendChild(iframe);
+
+    panel.appendChild(header);
+    panel.appendChild(iframeWrap);
+
+    // Floating button icon (chat bubble)
+    const btn = document.createElement("button");
+    btn.id = "sirivaram-chat-btn";
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Open chat");
+    btn.innerHTML = `
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3C7.03 3 3 6.58 3 11c0 2.26 1.07 4.3 2.8 5.74V21l3.3-1.82c.9.25 1.86.38 2.9.38 4.97 0 9-3.58 9-8s-4.03-8-9-8Z"
+          fill="rgba(255,255,255,0.14)" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M8 11h8M8 15h5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+
+    root.appendChild(panel);
+    root.appendChild(btn);
+    document.body.appendChild(root);
+
+    function openChat() {
+      panel.setAttribute("data-open", "true");
+      btn.setAttribute("aria-label", "Close chat");
+    }
+
+    function closeChat() {
+      panel.setAttribute("data-open", "false");
+      btn.setAttribute("aria-label", "Open chat");
+    }
+
+    function toggleChat() {
+      const isOpen = panel.getAttribute("data-open") === "true";
+      if (isOpen) closeChat();
+      else openChat();
+    }
+
+    btn.addEventListener("click", toggleChat);
+    closeBtn.addEventListener("click", closeChat);
+
+    // Close on ESC
+    window.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeChat();
+    });
+  })();
+</script>
+
+ <!-- <script>
+      (function () {
+        if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+          window.chatbase = (...args) => {
+            if (!window.chatbase.q) window.chatbase.q = [];
+            window.chatbase.q.push(args);
+          };
+
+          window.chatbase = new Proxy(window.chatbase, {
+            get(target, prop) {
+              if (prop === "q") return target.q;
+              return (...args) => target(prop, ...args);
+            },
+          });
+        }
+
+        const onLoad = function () {
+          const script = document.createElement("script");
+          script.src = "https://www.chatbase.co/embed.min.js";
+          script.async = true;
+
+          // ✅ YOUR CHATBASE BOT ID
+          script.id = "d_FLiJ6jSoG5A6gSWz-NC";
+
+          script.domain = "www.chatbase.co";
+          document.body.appendChild(script);
+        };
+
+        if (document.readyState === "complete") onLoad();
+        else window.addEventListener("load", onLoad);
+      })();
+    </script> -->
+
+
   </body>
 </html>
