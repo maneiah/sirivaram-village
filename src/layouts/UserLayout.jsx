@@ -61,17 +61,12 @@ const sidebarItems = useMemo(
       icon: <FaCalendarCheck size={18} />, // 📅 event-focused
       link: "/events",
     },
-    {
-      key: "/payments",
-      label: "My Payments",
-      icon: <MdAccountBalanceWallet size={18} />, // 💳 clearer than WalletOutlined
-      link: "/payments",
-    },
+   
     {
       key: "/gallery",
       label: "Gallery",
       icon: <FaImages size={18} />, // 🖼️ perfect fit
-      link: "/gallery",
+      link: "/gallery-view",
     },
     {
       key: "/blogs",
@@ -154,9 +149,8 @@ const adminName = localStorage.getItem("name") || "Admin";
           position: "fixed",
           height: "100vh",
           display: "flex",
-            flexDirection: "column",
+          flexDirection: "column",
           boxShadow: "2px 0 6px rgba(0,0,0,0.1)",
-        
         }}
       >
         {/* ✅ TOP (Fixed) : Logo */}
@@ -228,29 +222,6 @@ const adminName = localStorage.getItem("name") || "Admin";
             ))}
           </Menu>
         </div>
-
-        {/* ✅ BOTTOM (Fixed) : Logout */}
-        {/* <div style={{ padding: 12, borderTop: "1px solid #E5E7EB" }}>
-          <div
-            onClick={handleSignOut}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              cursor: "pointer",
-              padding: "12px 12px",
-              borderRadius: 12,
-              background: "#111827", // dark button looks nice on white sidebar
-              color: "#ffffff",
-              fontWeight: 800,
-              fontSize: 14,
-              justifyContent: collapsed ? "center" : "flex-start",
-            }}
-          >
-            <MdLogout size={18} />
-            <span className={`${collapsed ? "hidden" : "inline"}`}>Logout</span>
-          </div>
-        </div> */}
       </Sider>
 
       {/* ✅ MAIN */}
@@ -263,7 +234,7 @@ const adminName = localStorage.getItem("name") || "Admin";
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.1)", 
+            boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
             width: screens.xs ? "100%" : `calc(100% - ${leftWidth}px)`,
             marginLeft: screens.xs ? 0 : leftWidth,
             position: "fixed",
@@ -355,7 +326,7 @@ const adminName = localStorage.getItem("name") || "Admin";
           style={{
             textAlign: "center",
             background: "#ffffff",
-            boxShadow: "0 -2px 6px rgba(0,0,0,0.1)",                                
+            boxShadow: "0 -2px 6px rgba(0,0,0,0.1)",
             marginLeft: screens.xs ? 0 : leftWidth,
           }}
         >
@@ -388,6 +359,17 @@ const adminName = localStorage.getItem("name") || "Admin";
   .ant-menu::-webkit-scrollbar {
     width: 5px;
   }
+    /* ============================= */
+/* FIX: Mobile sidebar hamburger */
+/* ============================= */
+
+/* ✅ Permanently remove the mobile zero-width trigger (hamburger) */
+.ant-layout-sider-zero-width-trigger {
+  display: none !important;
+}
+
+
+
 
   .ant-layout-sider::-webkit-scrollbar-track,
   .ant-menu::-webkit-scrollbar-track {

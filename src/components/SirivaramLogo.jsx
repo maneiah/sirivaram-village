@@ -10,8 +10,13 @@ export default function SirivaramLogo({ isScrolled = false, size = 42 }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: isScrolled ? "rgba(255,255,255,0.2)" : "#92400e", // amber-900
-        backdropFilter: isScrolled ? "blur(6px)" : "none",
+
+        // ✅ NO WHITE — amber shades only
+        background: isScrolled ? "#E5E7EB" : "#E5E7EB", // amber-800 : amber-900
+        transition: "background 0.25s ease",
+
+        // optional subtle depth (not white)
+        boxShadow: isScrolled ? "0 4px 12px rgba(0,0,0,0.25)" : "none",
       }}
     >
       <svg
@@ -20,7 +25,9 @@ export default function SirivaramLogo({ isScrolled = false, size = 42 }) {
         style={{
           width: size * 0.85,
           height: size * 0.85,
-          filter: isScrolled ? "invert(1)" : "none",
+
+          // ❌ removed invert(1)
+          filter: "none",
         }}
       >
         {/* House */}

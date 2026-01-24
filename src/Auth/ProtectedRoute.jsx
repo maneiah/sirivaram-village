@@ -2,8 +2,6 @@ import { Navigate, useLocation } from "react-router-dom";
 
 export default function ProtectedRoute({ children }) {
   const location = useLocation();
-
-  // ✅ Check JWT token
   const token = localStorage.getItem("token");
 
   if (!token) {
