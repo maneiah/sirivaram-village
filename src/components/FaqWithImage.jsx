@@ -1,8 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Accordion, Container, Grid, Image, Title } from "@mantine/core";
+import { useLocation } from "react-router-dom";
 import image from "../assets/image.b0c2306b.png";
 
 export default function FaqWithImage() {
+  const location = useLocation();
+
+  // ✅ Auto-scroll when URL is "/#faq"
+  useEffect(() => {
+    if (location.hash !== "#faq") return;
+
+    const el = document.querySelector("#faq");
+    if (!el) return;
+
+    setTimeout(() => {
+      const yOffset = -90; // header offset
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }, 150);
+  }, [location.hash]);
+
   return (
     <section
       id="faq"

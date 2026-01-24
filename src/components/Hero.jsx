@@ -3,8 +3,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const FULL_TEXT = "Welcome to Sirivaram";
+
 const CAROUSEL_IMAGES = [
   {
     id: 1,
@@ -31,13 +33,51 @@ const CAROUSEL_IMAGES = [
 export default function Hero() {
   const [displayedText, setDisplayedText] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const timerRef = useRef(null);
   const carouselTimerRef = useRef(null);
 
-  // Typing effect (now with single brand color style)
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // ✅ Smooth scroll helper (works even if user is on a different route)
+  const smoothScrollTo = (e, sectionId) => {
+    e.preventDefault();
+
+    // If not on home, navigate first
+    if (location.pathname !== "/") {
+      navigate("/" + sectionId);
+
+      // Wait for home page to render then scroll
+      setTimeout(() => {
+        const el = document.querySelector(sectionId);
+        if (el) {
+          const yOffset = -90; // header offset
+          const y =
+            el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }
+      }, 200);
+
+      return;
+    }
+
+    // Already on home → scroll directly
+    const el = document.querySelector(sectionId);
+    if (el) {
+      const yOffset = -90;
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+      window.scrollTo({ top: y, behavior: "smooth" });
+      window.history.replaceState(null, "", sectionId);
+    }
+  };
+
+  // Typing effect
   useEffect(() => {
     const reduceMotion = window.matchMedia?.(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
     if (reduceMotion) {
@@ -70,7 +110,7 @@ export default function Hero() {
 
   const handlePrevImage = () => {
     setCurrentImageIndex(
-      (prev) => (prev - 1 + CAROUSEL_IMAGES.length) % CAROUSEL_IMAGES.length
+      (prev) => (prev - 1 + CAROUSEL_IMAGES.length) % CAROUSEL_IMAGES.length,
     );
   };
 
@@ -99,7 +139,7 @@ export default function Hero() {
           </div>
         ))}
 
-        {/* Amber-tinted overlay to match header/footer theme */}
+        {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/55 to-amber-900/70" />
       </div>
 
@@ -161,24 +201,26 @@ export default function Hero() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href="/register"
+          {/* ✅ Use navigate instead of <a href> to avoid reload */}
+          <button
+            onClick={() => navigate("/register")}
             className="px-8 py-3 bg-amber-600 text-white rounded-lg font-semibold 
                        hover:bg-amber-700 transition-all shadow-md hover:shadow-lg
                        focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
             aria-label="Create your account and get started"
           >
             Get Started
-          </a>
-          <a
-            href="/#about"
+          </button>
+
+          <button
+            onClick={(e) => smoothScrollTo(e, "#about")}
             className="px-8 py-3 border-2 border-amber-200/80 text-amber-50 rounded-lg 
                        font-semibold bg-white/5 hover:bg-white/10 transition-all
                        focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
             aria-label="Learn more about Sirivaram"
           >
             Learn More
-          </a>
+          </button>
         </div>
       </div>
     </section>

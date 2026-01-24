@@ -4,6 +4,9 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import RootLayout from "./layouts/RootLayout.jsx";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import Events from "./Pages/Events.jsx";
+import ProtectedRoute from "./Auth/ProtectedRoute.jsx";
+import UserDashboard from "./Pages/UserDashboard.jsx";
 
 // Lazy-loaded pages
 const Home = lazy(() => import("./Pages/Home.jsx"));
@@ -59,6 +62,22 @@ function App() {
             <Route path="/about-village" element={<AboutVillage />} />
             <Route path="/gallery" element={<GalleryPage />} />
           </Route>
+          <Route
+            path="/events"
+            element={
+              <ProtectedRoute>
+                <Events />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Suspense>
     </>

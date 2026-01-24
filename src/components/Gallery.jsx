@@ -1,8 +1,8 @@
 // src/components/Gallery.jsx
 "use client";
 
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const galleryImages = [
   {
@@ -34,13 +34,12 @@ const galleryImages = [
       "https://png.pngtree.com/thumb_back/fw800/background/20251005/pngtree-nighttime-village-celebration-with-fireworks-and-glowing-festive-lights-image_19765805.webp",
   },
   {
-    id: 6,
+    id: 5,
     title: "Misty Green Hills",
     category: "Nature",
     image:
       "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80",
   },
-
   {
     id: 6,
     title: "Sunrise Over Green Fields",
@@ -65,10 +64,26 @@ const galleryImages = [
 ];
 
 export default function Gallery() {
+  const location = useLocation();
+
+  // ✅ Auto scroll when URL is "/#gallery"
+  useEffect(() => {
+    if (location.hash !== "#gallery") return;
+
+    const el = document.querySelector("#gallery");
+    if (!el) return;
+
+    setTimeout(() => {
+      const yOffset = -90; // header height
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }, 150);
+  }, [location.hash]);
+
   return (
     <section
       id="gallery"
-      className=" px-4 sm:px-6 lg:px-8 bg-white"
+      className="px-4 sm:px-6 lg:px-8 bg-white py-16"
       aria-labelledby="gallery-heading"
     >
       <div className="max-w-7xl mx-auto">
@@ -95,7 +110,7 @@ export default function Gallery() {
           </Link>
         </div>
 
-        {/* Image grid */}
+        {/* Image Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {galleryImages.map((img) => (
             <div

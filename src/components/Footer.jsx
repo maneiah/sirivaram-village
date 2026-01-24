@@ -1,12 +1,49 @@
 import React from "react";
-import { Facebook, Instagram } from "lucide-react";
+import { Facebook, Instagram, ArrowUp } from "lucide-react";
 import { FaWhatsappSquare } from "react-icons/fa";
 import { IoLogoYoutube } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const location = useLocation();
+  const navigate = useNavigate();
 
+  // ✅ smooth scroll helper (works from any route)
+  const smoothScroll = (e, sectionId) => {
+    e.preventDefault();
+
+    // If not on home, navigate first
+    if (location.pathname !== "/") {
+      navigate("/" + sectionId);
+
+      setTimeout(() => {
+        const el = document.querySelector(sectionId);
+        if (el) {
+          const yOffset = -90;
+          const y =
+            el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }
+      }, 200);
+
+      return;
+    }
+
+    // already on home
+    const el = document.querySelector(sectionId);
+    if (el) {
+      const yOffset = -90;
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+      window.history.replaceState(null, "", sectionId);
+    }
+  };
+
+  const backToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.history.replaceState(null, "", location.pathname);
+  };
 
   return (
     <footer className="bg-amber-900 text-white py-12 px-4 sm:px-6 lg:px-8 relative">
@@ -105,18 +142,22 @@ export default function Footer() {
             <h2 className="font-semibold mb-4 text-amber-50 text-sm uppercase tracking-wide">
               Quick Links
             </h2>
+
             <ul className="space-y-2 text-amber-100 text-sm">
               <li>
                 <a
                   href="/#about"
+                  onClick={(e) => smoothScroll(e, "#about")}
                   className="hover:text-white transition-colors"
                 >
                   About
                 </a>
               </li>
               <li>
+                {/* ✅ FIXED: blog id is #blog (not #blogs) */}
                 <a
-                  href="/#blogs"
+                  href="/#blog"
+                  onClick={(e) => smoothScroll(e, "#blog")}
                   className="hover:text-white transition-colors"
                 >
                   Blogs
@@ -124,44 +165,32 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="/#contact"
-                  className="hover:text-white transition-colors"
-                >
-                  Contact
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/about-village"
-                  className="hover:text-white transition-colors"
-                >
-                  Explore Village
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/gallery"
+                  href="/#gallery"
+                  onClick={(e) => smoothScroll(e, "#gallery")}
                   className="hover:text-white transition-colors"
                 >
                   Gallery
                 </a>
               </li>
               <li>
-                <Link
-                  to="/login"
+                <a
+                  href="/#faq"
+                  onClick={(e) => smoothScroll(e, "#faq")}
                   className="hover:text-white transition-colors"
                 >
-                  Login
-                </Link>
+                  FAQ
+                </a>
               </li>
               <li>
-                <Link
-                  to="/register"
+                <a
+                  href="/#contact"
+                  onClick={(e) => smoothScroll(e, "#contact")}
                   className="hover:text-white transition-colors"
                 >
-                  Register
-                </Link>
+                  Contact
+                </a>
               </li>
+             
             </ul>
           </div>
 
@@ -202,6 +231,7 @@ export default function Footer() {
               >
                 <Facebook className="w-5 h-5 text-white" />
               </a>
+
               <a
                 href="https://instagram.com"
                 target="_blank"
@@ -215,6 +245,7 @@ export default function Footer() {
               >
                 <Instagram className="w-5 h-5 text-white" />
               </a>
+
               <a
                 href="https://wa.me/917093485208"
                 target="_blank"
@@ -224,6 +255,7 @@ export default function Footer() {
               >
                 <FaWhatsappSquare className="w-5 h-5 text-white" />
               </a>
+
               <a
                 href="https://youtube.com"
                 target="_blank"
@@ -237,8 +269,14 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Back to Top Button */}
-     
+        {/* ✅ Back to Top Button */}
+        <button
+          onClick={backToTop}
+          className="fixed bottom-6 right-6 z-50 bg-amber-700 hover:bg-amber-800 text-white w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
+          aria-label="Back to top"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
 
         {/* Bottom line */}
         <div className="border-t border-amber-800 pt-6 mt-6">

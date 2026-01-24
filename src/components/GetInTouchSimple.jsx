@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function GetInTouchSimple() {
+  const location = useLocation();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,17 +14,34 @@ export default function GetInTouchSimple() {
   const [errors, setErrors] = useState({});
   const [responseData, setResponseData] = useState(null);
 
+  // ✅ Auto-scroll when URL is "/#contact"
+  useEffect(() => {
+    if (location.hash !== "#contact") return;
+
+    const el = document.querySelector("#contact");
+    if (!el) return;
+
+    setTimeout(() => {
+      const yOffset = -90; // header offset
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }, 150);
+  }, [location.hash]);
+
   const validate = () => {
     let newErrors = {};
 
     if (formData.name.trim().length < 2) {
       newErrors.name = "Name must be at least 2 characters";
     }
-    if (!/^\S+@\S+$/.test(formData.email)) {
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       newErrors.email = "Invalid email format";
     }
     if (formData.subject.trim().length === 0) {
       newErrors.subject = "Subject is required";
+    }
+    if (formData.message.trim().length < 5) {
+      newErrors.message = "Message must be at least 5 characters";
     }
 
     setErrors(newErrors);
@@ -30,8 +50,11 @@ export default function GetInTouchSimple() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setResponseData(null);
+
     if (!validate()) return;
 
+    // ✅ Mock API response (replace later with actual API)
     const apiResponse = {
       status: true,
       message: "Message sent successfully!",
@@ -40,6 +63,10 @@ export default function GetInTouchSimple() {
     };
 
     setResponseData(apiResponse);
+
+    // ✅ Optional: clear form after success
+    setFormData({ name: "", email: "", subject: "", message: "" });
+    setErrors({});
   };
 
   return (
@@ -73,7 +100,7 @@ export default function GetInTouchSimple() {
                   required
                 />
                 {errors.name && (
-                  <p className="text-red-600 text-sm">{errors.name}</p>
+                  <p className="text-red-600 text-sm mt-1">{errors.name}</p>
                 )}
               </div>
 
@@ -93,7 +120,7 @@ export default function GetInTouchSimple() {
                   required
                 />
                 {errors.email && (
-                  <p className="text-red-600 text-sm">{errors.email}</p>
+                  <p className="text-red-600 text-sm mt-1">{errors.email}</p>
                 )}
               </div>
             </div>
@@ -114,7 +141,7 @@ export default function GetInTouchSimple() {
                 required
               />
               {errors.subject && (
-                <p className="text-red-600 text-sm">{errors.subject}</p>
+                <p className="text-red-600 text-sm mt-1">{errors.subject}</p>
               )}
             </div>
 
@@ -131,7 +158,11 @@ export default function GetInTouchSimple() {
                 onChange={(e) =>
                   setFormData({ ...formData, message: e.target.value })
                 }
+                required
               />
+              {errors.message && (
+                <p className="text-red-600 text-sm mt-1">{errors.message}</p>
+              )}
             </div>
 
             <div className="flex justify-center mt-6">
