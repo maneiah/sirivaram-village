@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  EyeOutlined,
+  EyeInvisibleOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 
 const API_URL = "https://sirivaram-backed.onrender.com/api/auth/login";
 
@@ -14,106 +19,114 @@ export default function LoginPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [info, setInfo] = useState("");
+  const [success, setSuccess] = useState("");
 
-  // ✅ Only digits for mobile (blocks characters)
+  // Mobile input: only digits, max 10
   const handleMobileChange = (e) => {
-    const onlyDigits = e.target.value.replace(/\D/g, ""); // remove non-digits
-    const limited = onlyDigits.slice(0, 10); // limit to 10 digits
-    setMobile(limited);
+    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setMobile(value);
     setError("");
-    setInfo("");
+    setSuccess("");
   };
 
-  const validate = () => {
+  const validateForm = () => {
     if (!mobile || !password) return "Please fill in all fields";
-    if (mobile.trim().length !== 10)
-      return "Please enter a valid 10-digit mobile number";
+    if (mobile.length !== 10) return "Mobile number must be exactly 10 digits";
     return "";
   };
 
-const handleLogin = async (e) => {
-  e.preventDefault();
-  setError("");
-  setInfo("");
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
 
-  const v = validate();
-  if (v) {
-    setError(v);
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        accept: "*/*",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        mobile: mobile.trim(),
-        password,
-      }),
-    });
-
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok || data?.success === false) {
-      setError(data?.message || "Login failed");
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
-    // ✅ SAVE USER DATA
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("userId", data.userId);
-    localStorage.setItem("name", data.name);
-    localStorage.setItem("role", data.role);
-    localStorage.setItem("mobile", data.mobile);
-    localStorage.setItem("status", data.status);
+    try {
+      setLoading(true);
 
-    setInfo("Login successful! Redirecting...");
-    setMobile("");
-    setPassword("");
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          mobile: mobile.trim(),
+          password,
+        }),
+      });
 
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 800);
-  } catch (err) {
-    setError(err.message || "Network error. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+      const data = await res.json();
+
+      if (!res.ok || data?.success === false) {
+        throw new Error(
+          data?.message || "Login failed. Please check your credentials.",
+        );
+      }
+
+      // Save user data to localStorage
+      localStorage.setItem("token", data.token || "");
+      localStorage.setItem("userId", data.userId || "");
+      localStorage.setItem("name", data.name || "");
+      localStorage.setItem("role", data.role || "");
+      localStorage.setItem("mobile", data.mobile || "");
+      localStorage.setItem("status", data.status || "");
+
+      setSuccess("Login successful! Redirecting...");
+      setMobile("");
+      setPassword("");
+
+      // Smooth redirect after brief success message
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
+    } catch (err) {
+      setError(err.message || "Network error. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
-      <div className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-amber-900 mb-2 text-center">
-            Welcome Back
-          </h1>
-          <p className="text-gray-600 text-center mb-8">
-            Login to your Sirivaram account
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-10 border border-amber-100">
+          {/* Logo / Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-amber-900">
+              Sirivaram
+            </h1>
+            <p className="mt-2 text-lg text-amber-700 font-medium">
+              Welcome Back
+            </p>
+            <p className="mt-1 text-gray-600">
+              Sign in to continue to your account
+            </p>
+          </div>
 
-          {/* ERROR */}
+          {/* Success Message */}
+          {success && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg text-center font-medium">
+              {success}
+            </div>
+          )}
+
+          {/* Error Message */}
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg text-center">
               {error}
             </div>
           )}
 
-          {/* INFO */}
-          {info && (
-            <div className="bg-blue-50 border border-blue-300 text-blue-700 px-4 py-3 rounded mb-4">
-              {info}
-            </div>
-          )}
-
+          {/* Form */}
           <form onSubmit={handleLogin} className="space-y-6" noValidate>
-            {/* Mobile */}
+            {/* Mobile Number */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Mobile Number
@@ -121,12 +134,16 @@ const handleLogin = async (e) => {
               <input
                 type="tel"
                 inputMode="numeric"
-                pattern="[0-9]*"
-                placeholder="Enter 10-digit number"
+                placeholder="Enter 10-digit mobile"
                 value={mobile}
                 onChange={handleMobileChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-700"
+                disabled={loading}
+                className="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent transition"
+                autoFocus
               />
+              <p className="mt-2 text-sm text-gray-500">
+                {mobile.length}/10 digits
+              </p>
             </div>
 
             {/* Password */}
@@ -142,45 +159,59 @@ const handleLogin = async (e) => {
                   onChange={(e) => {
                     setPassword(e.target.value);
                     setError("");
-                    setInfo("");
+                    setSuccess("");
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-700"
+                  disabled={loading}
+                  className="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent pr-12 transition"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-amber-700 text-xl"
                   aria-label="Toggle password visibility"
                 >
-                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                  {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
                 </button>
               </div>
             </div>
 
-            {/* Login Button */}
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 rounded-lg font-semibold transition ${
+              className={`w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 ${
                 loading
                   ? "bg-amber-400 cursor-not-allowed text-white"
-                  : "bg-amber-700 hover:bg-amber-800 text-white"
+                  : "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               }`}
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? (
+                <>
+                  <LoadingOutlined spin />
+                  Logging in...
+                </>
+              ) : (
+                "Login"
+              )}
             </button>
           </form>
 
-          <p className="text-center text-gray-600 mt-6">
-            Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="text-amber-700 font-semibold hover:underline"
-            >
-              Register here
-            </Link>
-          </p>
+          {/* Register Link */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-600">
+              New to Sirivaram?{" "}
+              <Link
+                to="/register"
+                className="font-semibold text-amber-700 hover:text-amber-800 hover:underline transition"
+              >
+                Create an account
+              </Link>
+            </p>
+          </div>
         </div>
+
+       
       </div>
     </div>
   );

@@ -12,6 +12,8 @@ import Events from "./Pages/Events.jsx";
 import UserDashboard from "./Pages/UserDashboard.jsx";
 import Gallery from "./Pages/Gallery.jsx";
 import Blogs from "./Pages/Blogs.jsx";
+import MyPayments from "./Pages/MyPayments.jsx";
+import UpcomingEvents from "./Pages/UpcomingEvents.jsx";
 
 // Lazy-loaded public pages
 const Home = lazy(() => import("./Pages/Home.jsx"));
@@ -55,12 +57,13 @@ export default function App() {
       <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
         <Routes>
           {/* ✅ PUBLIC ROUTES */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route element={<RootLayout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/about-village" element={<AboutVillage />} />
-            <Route path="/gallery" element={<GalleryPage />} />
+
+            {/* <Route path="/about-village" element={<AboutVillage />} />
+            <Route path="/gallery" element={<GalleryPage />} /> */}
           </Route>
 
           {/* ✅ PROTECTED ROUTES */}
@@ -93,6 +96,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Blogs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payments"
+            element={
+              <ProtectedRoute>
+                <MyPayments />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/upcoming-events"
+            element={
+              <ProtectedRoute>
+                <UpcomingEvents />
               </ProtectedRoute>
             }
           />

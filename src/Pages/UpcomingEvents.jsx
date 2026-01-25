@@ -44,7 +44,8 @@ import {
 const { Title, Text } = Typography;
 
 // ✅ APIs
-const EVENTS_API = "https://sirivaram-backed.onrender.com/api/events";
+const UPCOMING_API =
+  "https://sirivaram-backed.onrender.com/api/events/upcoming";
 const MY_PAYMENTS_API = "https://sirivaram-backed.onrender.com/api/payments/my";
 const PAY_API_BASE = "https://sirivaram-backed.onrender.com/api/payments/event";
 
@@ -55,7 +56,7 @@ const BTN_GREEN = "#1ab394";
 // ✅ JWT token helper
 const getToken = () => localStorage.getItem("token");
 
-export default function Events() {
+export default function UpcomingEvents() {
 
 
   const [events, setEvents] = useState([]);
@@ -67,7 +68,7 @@ export default function Events() {
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   const [visibility, setVisibility] = useState("all");
-  const [sortBy, setSortBy] = useState("startDesc");
+  const [sortBy, setSortBy] = useState("startAsc"); // Earliest first
 
   // QR modal
   const [qrOpen, setQrOpen] = useState(false);
@@ -98,14 +99,15 @@ export default function Events() {
 
   const loadEvents = async () => {
     try {
-      setError("");
-      const res = await axios.get(EVENTS_API);
+      const res = await axios.get(UPCOMING_API);
       const list = extractEventsArray(res.data);
       setEvents(Array.isArray(list) ? list : []);
     } catch (err) {
       setEvents([]);
       setError(
-        err?.response?.data?.message || err?.message || "Unable to load events",
+        err?.response?.data?.message ||
+          err?.message ||
+          "Unable to load upcoming events",
       );
     }
   };
@@ -135,6 +137,7 @@ export default function Events() {
 
   const loadData = async () => {
     setLoading(true);
+    setError("");
     await Promise.all([loadEvents(), loadUserPayments()]);
     setLoading(false);
   };
@@ -167,7 +170,7 @@ export default function Events() {
     list.sort((a, b) => {
       const da = dayjs(a.startDate).valueOf();
       const db = dayjs(b.startDate).valueOf();
-      return sortBy === "startDesc" ? db - da : da - db;
+      return sortBy === "startAsc" ? da - db : db - da;
     });
 
     return list;
@@ -221,7 +224,7 @@ export default function Events() {
       setSelectedEvent(null);
       form.resetFields();
 
-      // Refresh user payments to update status/button immediately
+      // Refresh payments to update button/status
       await loadUserPayments();
     } catch (err) {
       message.error(
@@ -290,11 +293,11 @@ export default function Events() {
             <Col xs={24} md={14}>
               <Space direction="vertical" size={4}>
                 <Title level={3} style={{ margin: 0 }}>
-                  Events
+                  Upcoming Events
                 </Title>
                 <Text type="secondary">
-                  Browse all events (past & upcoming), view details, QR codes,
-                  and submit payment proof.
+                  View upcoming events, submit payment proof, and access QR
+                  codes.
                 </Text>
               </Space>
             </Col>
@@ -366,8 +369,8 @@ export default function Events() {
                 onChange={setSortBy}
                 style={{ width: "100%" }}
                 options={[
-                  { value: "startDesc", label: "Recent first" },
-                  { value: "startAsc", label: "Oldest first" },
+                  { value: "startAsc", label: "Earliest first" },
+                  { value: "startDesc", label: "Latest first" },
                 ]}
               />
             </Col>
@@ -379,7 +382,7 @@ export default function Events() {
           <Alert
             style={{ marginTop: 12, borderRadius: 14 }}
             type="error"
-            message="Unable to load events"
+            message="Unable to load upcoming events"
             description={
               <Space direction="vertical" size={8}>
                 <Text>{error}</Text>
@@ -404,7 +407,7 @@ export default function Events() {
         {/* Empty */}
         {!error && !loading && filteredEvents.length === 0 && (
           <Card style={{ marginTop: 12, borderRadius: 16 }}>
-            <Empty description="No events found" />
+            <Empty description="No upcoming events" />
           </Card>
         )}
 
@@ -442,7 +445,7 @@ export default function Events() {
                         size={10}
                         style={{ width: "100%" }}
                       >
-                        {/* Title & Tags */}
+                        {/* Title & Visibility */}
                         <div
                           style={{
                             display: "flex",
@@ -464,33 +467,15 @@ export default function Events() {
                             </Text>
                           </div>
 
-                          <Space direction="vertical" size={4}>
-                            <Tag
-                              icon={
-                                e.isPublic ? (
-                                  <GlobalOutlined />
-                                ) : (
-                                  <LockOutlined />
-                                )
-                              }
-                              color={e.isPublic ? "green" : "red"}
-                              style={{ margin: 0, borderRadius: 999 }}
-                            >
-                              {e.isPublic ? "Public" : "Private"}
-                            </Tag>
-                            <Tag
-                              color={
-                                dayjs(e.startDate).isAfter(dayjs())
-                                  ? "blue"
-                                  : "orange"
-                              }
-                              style={{ borderRadius: 999 }}
-                            >
-                              {dayjs(e.startDate).isAfter(dayjs())
-                                ? "Upcoming"
-                                : "Past"}
-                            </Tag>
-                          </Space>
+                          <Tag
+                            icon={
+                              e.isPublic ? <GlobalOutlined /> : <LockOutlined />
+                            }
+                            color={e.isPublic ? "green" : "red"}
+                            style={{ margin: 0, borderRadius: 999 }}
+                          >
+                            {e.isPublic ? "Public" : "Private"}
+                          </Tag>
                         </div>
 
                         {/* Description */}

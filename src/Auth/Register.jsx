@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  EyeOutlined,
+  EyeInvisibleOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 
 const API_URL = "https://sirivaram-backed.onrender.com/api/auth/register";
 
@@ -20,36 +25,32 @@ export default function RegisterPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const onChange = (key) => (e) => {
+  // Generic change handler
+  const handleChange = (key) => (e) => {
     setFormData((prev) => ({ ...prev, [key]: e.target.value }));
     setError("");
-    setSuccessMsg("");
+    setSuccess("");
   };
 
-  // ✅ Only digits for mobile (blocks characters)
+  // Mobile: digits only, max 10
   const handleMobileChange = (e) => {
-    const onlyDigits = e.target.value.replace(/\D/g, ""); // remove non-digits
-    const limited = onlyDigits.slice(0, 10); // limit to 10 digits
-    setFormData((prev) => ({ ...prev, mobile: limited }));
+    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setFormData((prev) => ({ ...prev, mobile: value }));
     setError("");
-    setSuccessMsg("");
+    setSuccess("");
   };
 
-  const validate = () => {
+  const validateForm = () => {
     const { name, mobile, password } = formData;
 
-    if (!name.trim()) return "Please enter your name";
-
-    if (!mobile.trim()) return "Please enter mobile number";
-    if (mobile.trim().length !== 10)
-      return "Please enter a valid 10-digit mobile number";
-
-    if (!password) return "Please enter password";
+    if (!name.trim()) return "Please enter your full name";
+    if (!mobile) return "Please enter your mobile number";
+    if (mobile.length !== 10) return "Mobile number must be exactly 10 digits";
+    if (!password) return "Please create a password";
     if (password.length < 6) return "Password must be at least 6 characters";
-
-    if (!confirmPassword) return "Please confirm password";
+    if (!confirmPassword) return "Please confirm your password";
     if (password !== confirmPassword) return "Passwords do not match";
 
     return "";
@@ -58,11 +59,11 @@ export default function RegisterPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccessMsg("");
+    setSuccess("");
 
-    const v = validate();
-    if (v) {
-      setError(v);
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -78,174 +79,200 @@ export default function RegisterPage() {
       const res = await fetch(API_URL, {
         method: "POST",
         headers: {
-          accept: "*/*",
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json().catch(() => null);
+      const data = await res.json();
 
-      if (!res.ok) {
-        const msg =
+      if (!res.ok || !data?.success) {
+        throw new Error(
           data?.message ||
-          data?.error ||
-          `Registration failed (Status: ${res.status})`;
-        setError(msg);
-        return;
-      }
-
-      if (data?.success) {
-        setSuccessMsg(
-          data?.message || "Registered successfully! Waiting for approval.",
+            data?.error ||
+            "Registration failed. Please try again.",
         );
-
-        setFormData({ name: "", mobile: "", password: "" });
-        setConfirmPassword("");
-
-        setTimeout(() => navigate("/login"), 1200);
-      } else {
-        setError(data?.message || "Registration failed. Please try again.");
       }
+
+      setSuccess(
+        data?.message || "Registered successfully! Redirecting to login...",
+      );
+      setFormData({ name: "", mobile: "", password: "" });
+      setConfirmPassword("");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (err) {
-      setError(err.message || "Network error. Please try again.");
+      setError(err.message || "Network error. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
-      <div className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-amber-900 mb-2 text-center">
-            Join Sirivaram
-          </h1>
-          <p className="text-gray-600 text-center mb-8">
-            Create your account today
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-amber-100">
+          {/* Title */}
+          <div className="text-center mb-6">
+            <h1 className="text-3xl sm:text-4xl font-bold text-amber-900">
+              Sirivaram
+            </h1>
+            <p className="mt-1 text-gray-600 text-base">
+              Create your account in seconds
+            </p>
+          </div>
 
-          {/* Error */}
+          {/* Success Message */}
+          {success && (
+            <div className="mb-5 p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg text-center text-sm font-medium">
+              {success}
+            </div>
+          )}
+
+          {/* Error Message */}
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <div className="mb-5 p-3 bg-red-50 border border-red-200 text-red-800 rounded-lg text-center text-sm">
               {error}
             </div>
           )}
 
-          {/* Success */}
-          {successMsg && (
-            <div className="bg-green-50 border border-green-300 text-green-700 px-4 py-3 rounded mb-4">
-              {successMsg}
-            </div>
-          )}
-
+          {/* Form */}
           <form onSubmit={handleRegister} className="space-y-5" noValidate>
             {/* Name */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Name
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Full Name
               </label>
               <input
                 type="text"
                 placeholder="Enter your full name"
                 value={formData.name}
-                onChange={onChange("name")}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-700"
+                onChange={handleChange("name")}
+                disabled={loading}
+                className="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent transition"
+                autoFocus
               />
             </div>
 
             {/* Mobile */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Mobile Number
               </label>
               <input
                 type="tel"
                 inputMode="numeric"
-                pattern="[0-9]*"
-                placeholder="Enter 10-digit number"
+                placeholder="Enter 10-digit mobile"
                 value={formData.mobile}
                 onChange={handleMobileChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-700"
+                disabled={loading}
+                className="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent transition"
               />
+              <p className="mt-1.5 text-sm text-gray-500">
+                {formData.mobile.length}/10 digits
+              </p>
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Password
               </label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Create a password"
+                  placeholder="Create a strong password (min 6 chars)"
                   value={formData.password}
-                  onChange={onChange("password")}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-700"
+                  onChange={handleChange("password")}
+                  disabled={loading}
+                  className="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent pr-12 transition"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-amber-700 text-xl"
                   aria-label="Toggle password visibility"
                 >
-                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                  {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
                 </button>
               </div>
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Confirm Password
               </label>
               <div className="relative">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm your password"
+                  placeholder="Re-enter your password"
                   value={confirmPassword}
                   onChange={(e) => {
                     setConfirmPassword(e.target.value);
                     setError("");
-                    setSuccessMsg("");
+                    setSuccess("");
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-700"
+                  disabled={loading}
+                  className="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent pr-12 transition"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowConfirmPassword((s) => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  disabled={loading}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-amber-700 text-xl"
                   aria-label="Toggle confirm password visibility"
                 >
-                  {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+                  {showConfirmPassword ? (
+                    <EyeInvisibleOutlined />
+                  ) : (
+                    <EyeOutlined />
+                  )}
                 </button>
               </div>
             </div>
 
-            {/* Register Button */}
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 rounded-lg font-semibold transition ${
+              className={`w-full py-3.5 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 ${
                 loading
-                  ? "bg-amber-400 text-white cursor-not-allowed"
-                  : "bg-amber-700 text-white hover:bg-amber-800"
+                  ? "bg-amber-400 cursor-not-allowed text-white"
+                  : "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               }`}
             >
-              {loading ? "Registering..." : "Register"}
+              {loading ? (
+                <>
+                  <LoadingOutlined spin />
+                  Creating Account...
+                </>
+              ) : (
+                "Register"
+              )}
             </button>
           </form>
 
-          <p className="text-center text-gray-600 mt-6">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              className="text-amber-700 font-semibold hover:underline"
-            >
-              Login here
-            </Link>
-          </p>
+          {/* Login Link */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-600 text-sm">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="font-semibold text-amber-700 hover:text-amber-800 hover:underline transition"
+              >
+                Sign in here
+              </Link>
+            </p>
+          </div>
         </div>
+
+      
       </div>
     </div>
   );

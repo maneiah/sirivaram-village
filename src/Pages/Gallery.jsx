@@ -16,6 +16,8 @@ import {
   Image,
   Tag,
   Tooltip,
+  Divider,
+  message,
 } from "antd";
 import {
   ReloadOutlined,
@@ -23,17 +25,26 @@ import {
   PlayCircleOutlined,
   PictureOutlined,
   ClockCircleOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-
 
 const { Title, Text } = Typography;
 
 const API_BASE = "https://sirivaram-backed.onrender.com";
 
+// ✅ button colors
+const BTN_BLUE = "#008cba";
+const BTN_GREEN = "#1ab394";
+
+// ✅ JWT token helper
+const getToken = () =>
+  localStorage.getItem("token") || localStorage.getItem("accessToken") || "";
+
 export default function Gallery() {
-  const [year, setYear] = useState(dayjs().year()); // default current year
+  const [year, setYear] = useState(dayjs().year());
   const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
   const [sortBy, setSortBy] = useState("newest"); // newest | oldest
 
   const [items, setItems] = useState([]);
@@ -48,13 +59,18 @@ export default function Gallery() {
   const [openVideo, setOpenVideo] = useState(false);
   const [activeVideo, setActiveVideo] = useState("");
 
-  const token =
-    localStorage.getItem("token") || localStorage.getItem("accessToken") || "";
+  // ✅ Debounce search for performance
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQ(q.trim().toLowerCase()), 250);
+    return () => clearTimeout(t);
+  }, [q]);
 
   const loadGallery = async () => {
     try {
       setError("");
       setLoading(true);
+
+      const token = getToken();
 
       const res = await fetch(`${API_BASE}/api/gallery?year=${year}`, {
         headers: {
@@ -71,6 +87,8 @@ export default function Gallery() {
       }
 
       const data = await res.json();
+
+      // ✅ API returns array of objects including isActive
       setItems(Array.isArray(data) ? data : []);
     } catch (e) {
       setItems([]);
@@ -86,27 +104,33 @@ export default function Gallery() {
   }, [year]);
 
   const filtered = useMemo(() => {
-    const query = q.trim().toLowerCase();
-    let list = [...items];
+    let list = Array.isArray(items) ? [...items] : [];
 
-    // search
-    if (query) {
+    // ✅ USER SIDE: only show active items
+    list = list.filter((x) => x.isActive === true);
+
+    // ✅ search
+    if (debouncedQ) {
       list = list.filter((x) => {
         const t = (x.title || "").toLowerCase();
         const d = (x.description || "").toLowerCase();
-        return t.includes(query) || d.includes(query);
+        return t.includes(debouncedQ) || d.includes(debouncedQ);
       });
     }
 
-    // sort by createdAt
+    // ✅ sort by createdAt
     list.sort((a, b) => {
-      const da = dayjs(a.createdAt).valueOf();
-      const db = dayjs(b.createdAt).valueOf();
+      const da = dayjs(a.createdAt).isValid()
+        ? dayjs(a.createdAt).valueOf()
+        : 0;
+      const db = dayjs(b.createdAt).isValid()
+        ? dayjs(b.createdAt).valueOf()
+        : 0;
       return sortBy === "newest" ? db - da : da - db;
     });
 
     return list;
-  }, [items, q, sortBy]);
+  }, [items, debouncedQ, sortBy]);
 
   const openImageModal = (url) => {
     if (!url) return;
@@ -120,7 +144,16 @@ export default function Gallery() {
     setOpenVideo(true);
   };
 
-  // Build year dropdown (2024..2030) you can change range
+  const copyLink = async (link) => {
+    try {
+      await navigator.clipboard.writeText(link);
+      message.success("Link copied");
+    } catch {
+      message.error("Unable to copy link");
+    }
+  };
+
+  // Year dropdown
   const yearOptions = useMemo(() => {
     const now = dayjs().year();
     const start = now - 2;
@@ -132,48 +165,61 @@ export default function Gallery() {
 
   return (
     <UserLayout>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 12px" }}>
         {/* Header */}
-        <Row gutter={[12, 12]} align="middle" justify="space-between">
-          <Col xs={24} md={12}>
-            <Space direction="vertical" size={2}>
-              <Title level={3} style={{ margin: 0 }}>
-                Gallery
-              </Title>
-              <Text type="secondary">
-                Photos and videos of Sirivaram Village activities.
-              </Text>
-            </Space>
-          </Col>
-
-          <Col
-            xs={24}
-            md={12}
-            style={{ display: "flex", justifyContent: "flex-end" }}
-          >
-            <Space wrap>
-              <Select
-                value={year}
-                onChange={setYear}
-                style={{ width: 120 }}
-                options={yearOptions}
-              />
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={loadGallery}
-                loading={loading}
-              >
-                Refresh
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-
-        {/* Filters */}
         <Card
-          style={{ marginTop: 12, borderRadius: 16 }}
-          bodyStyle={{ padding: 14 }}
+          style={{
+            borderRadius: 18,
+            marginTop: 8,
+            boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
+          }}
+          bodyStyle={{ padding: 16 }}
         >
+          <Row gutter={[12, 12]} align="middle" justify="space-between">
+            <Col xs={24} md={14}>
+              <Space direction="vertical" size={2}>
+                <Title level={3} style={{ margin: 0 }}>
+                  Gallery
+                </Title>
+                <Text type="secondary">
+                  Photos and videos of Sirivaram Village activities.
+                </Text>
+              </Space>
+            </Col>
+
+            <Col
+              xs={24}
+              md={10}
+              style={{ display: "flex", justifyContent: "flex-end" }}
+            >
+              <Space wrap>
+                <Select
+                  value={year}
+                  onChange={setYear}
+                  style={{ width: 120 }}
+                  options={yearOptions}
+                />
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={loadGallery}
+                  loading={loading}
+                  style={{
+                    borderRadius: 10,
+                    background: BTN_GREEN,
+                    borderColor: BTN_GREEN,
+                    color: "#fff",
+                    fontWeight: 700,
+                  }}
+                >
+                  Refresh
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+
+          <Divider style={{ margin: "14px 0" }} />
+
+          {/* Filters */}
           <Row gutter={[12, 12]} align="middle">
             <Col xs={24} md={12} lg={10}>
               <Input
@@ -182,6 +228,7 @@ export default function Gallery() {
                 allowClear
                 prefix={<SearchOutlined />}
                 placeholder="Search by title or description..."
+                style={{ borderRadius: 12, height: 40 }}
               />
             </Col>
 
@@ -198,7 +245,11 @@ export default function Gallery() {
             </Col>
 
             <Col xs={12} md={6} lg={9} style={{ textAlign: "right" }}>
-              <Tag icon={<PictureOutlined />} color="blue">
+              <Tag
+                icon={<PictureOutlined />}
+                color="blue"
+                style={{ borderRadius: 999 }}
+              >
                 Total: {filtered.length}
               </Tag>
             </Col>
@@ -240,7 +291,11 @@ export default function Gallery() {
                 <Col key={g.id} xs={12} sm={12} md={8} lg={6}>
                   <Card
                     hoverable
-                    style={{ borderRadius: 16, height: "100%" }}
+                    style={{
+                      borderRadius: 16,
+                      height: "100%",
+                      boxShadow: "0 6px 18px rgba(0,0,0,0.05)",
+                    }}
                     bodyStyle={{ padding: 12 }}
                     cover={
                       <div
@@ -314,8 +369,7 @@ export default function Gallery() {
                         >
                           <Tag
                             icon={<ClockCircleOutlined />}
-                            color="default"
-                            style={{ margin: 0 }}
+                            style={{ margin: 0, borderRadius: 999 }}
                           >
                             {g.createdAt
                               ? dayjs(g.createdAt).format("DD MMM YYYY")
@@ -323,14 +377,42 @@ export default function Gallery() {
                           </Tag>
                         </Tooltip>
 
-                        <Button
-                          size="small"
-                          icon={<PlayCircleOutlined />}
-                          disabled={!g.videoUrl}
-                          onClick={() => openVideoModal(g.videoUrl)}
-                        >
-                          Video
-                        </Button>
+                        <Space size={6}>
+                          <Tooltip title="Copy link">
+                            <Button
+                              size="small"
+                              icon={<EyeOutlined />}
+                              onClick={() =>
+                                copyLink(g.imageUrl || g.videoUrl || "")
+                              }
+                              disabled={!g.imageUrl && !g.videoUrl}
+                              style={{
+                                borderRadius: 8,
+                                borderColor: BTN_BLUE,
+                                color: BTN_BLUE,
+                                fontWeight: 600,
+                              }}
+                            >
+                              Link
+                            </Button>
+                          </Tooltip>
+
+                          <Button
+                            size="small"
+                            icon={<PlayCircleOutlined />}
+                            disabled={!g.videoUrl}
+                            onClick={() => openVideoModal(g.videoUrl)}
+                            style={{
+                              borderRadius: 8,
+                              background: g.videoUrl ? BTN_GREEN : "#e5e7eb",
+                              borderColor: g.videoUrl ? BTN_GREEN : "#e5e7eb",
+                              color: g.videoUrl ? "#fff" : "#6b7280",
+                              fontWeight: 700,
+                            }}
+                          >
+                            Video
+                          </Button>
+                        </Space>
                       </Space>
                     </Space>
                   </Card>
@@ -370,11 +452,14 @@ export default function Gallery() {
         >
           {activeVideo ? (
             <div style={{ width: "100%" }}>
-              {/* Works for direct mp4 links. If your videoUrl is YouTube, tell me I’ll change iframe logic */}
               <video
                 src={activeVideo}
                 controls
-                style={{ width: "100%", borderRadius: 12, background: "#000" }}
+                style={{
+                  width: "100%",
+                  borderRadius: 12,
+                  background: "#000",
+                }}
               />
               <div style={{ marginTop: 10, textAlign: "right" }}>
                 <a href={activeVideo} target="_blank" rel="noopener noreferrer">

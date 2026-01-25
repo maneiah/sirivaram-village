@@ -14,6 +14,7 @@ import {
   Empty,
   Divider,
   message,
+  Image,
 } from "antd";
 import {
   CalendarOutlined,
@@ -36,7 +37,6 @@ const API_BASE = "https://sirivaram-backed.onrender.com";
 export default function UserDashboard() {
   const navigate = useNavigate();
 
-
   const [loading, setLoading] = useState(true);
 
   const [counts, setCounts] = useState({
@@ -50,6 +50,9 @@ export default function UserDashboard() {
   const [recentPayments, setRecentPayments] = useState([]);
   const [latestBlogs, setLatestBlogs] = useState([]);
   const [galleryItems, setGalleryItems] = useState([]);
+
+  // You can replace this with actual user data from your auth context
+  const userName = "Maneiah"; // Personalised from your display name
 
   const quickCards = useMemo(
     () => [
@@ -158,38 +161,33 @@ export default function UserDashboard() {
   return (
     <UserLayout>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        {/* ✅ Welcome / Hero */}
+        {/* Hero / Welcome Card */}
         <Card
           bordered
           style={{ borderRadius: 16, marginBottom: 16 }}
-          bodyStyle={{ padding: 16 }}
+          bodyStyle={{ padding: 24 }}
         >
-          <Row gutter={[12, 12]} align="middle" justify="space-between">
-            <Col xs={24} md={16}>
-              <Space direction="vertical" size={2} style={{ width: "100%" }}>
-                {/* ✅ Cleaner tags */}
-                <Space wrap style={{ marginTop: 10 }}>
-                  <Tag icon={<ThunderboltOutlined />} color="blue">
-                    Fast Access
-                  </Tag>
-                  <Tag icon={<MobileOutlined />} color="green">
-                    Mobile Friendly
-                  </Tag>
-                  <Tag icon={<SafetyOutlined />} color="gold">
-                    Secure
-                  </Tag>
-                </Space>
+          <Row gutter={[16, 16]} align="middle" justify="space-between">
+            <Col xs={24} md={14}>
+              <Space direction="vertical" size={12}>
+                <Title level={3} style={{ margin: 0 }}>
+                  Welcome back, {userName}!
+                </Title>
+                <Text type="secondary">
+                  Here's a quick overview of your community activities
+                </Text>
+               
               </Space>
             </Col>
 
-            <Col xs={24} md={8} style={{ textAlign: "right" }}>
-              <Space wrap>
+            <Col xs={24} md={10} style={{ textAlign: "right" }}>
+              <Space wrap size={12}>
                 <Button
                   type="primary"
+                  size="large"
                   style={{
                     backgroundColor: "#008cba",
                     borderColor: "#008cba",
-                    color: "white",
                   }}
                   onClick={() => navigate("/events")}
                   icon={<CalendarOutlined />}
@@ -197,6 +195,7 @@ export default function UserDashboard() {
                   View Events
                 </Button>
                 <Button
+                  size="large"
                   style={{
                     backgroundColor: "#1ab394",
                     borderColor: "#1ab394",
@@ -212,7 +211,7 @@ export default function UserDashboard() {
           </Row>
         </Card>
 
-        {/* ✅ Quick action cards */}
+        {/* Quick action cards */}
         <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
           {quickCards.map((c) => (
             <Col key={c.title} xs={24} sm={12} md={12} lg={6}>
@@ -241,7 +240,6 @@ export default function UserDashboard() {
                       size={44}
                     />
 
-                    {/* ✅ Better than tag */}
                     <Badge
                       count={loading ? "…" : c.count}
                       showZero
@@ -276,7 +274,7 @@ export default function UserDashboard() {
           ))}
         </Row>
 
-        {/* ✅ Two columns layout */}
+        {/* Main content - Two columns */}
         <Row gutter={[12, 12]}>
           {/* Upcoming Events */}
           <Col xs={24} lg={12}>
@@ -474,22 +472,39 @@ export default function UserDashboard() {
                           borderRadius: 12,
                           overflow: "hidden",
                           border: "1px solid #E5E7EB",
-                          background: "#F9FAFB",
+                          background: "#F3F4F6",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
                         title={g?.title || "Image"}
                       >
-                        <img
+                        <Image
                           src={g?.imageUrl || g?.url || g?.photoUrl}
-                          alt={g?.title || "gallery"}
+                          alt={`Gallery: ${g?.title || "Untitled image"}`}
                           style={{
                             width: "100%",
                             height: "100%",
                             objectFit: "cover",
-                            display: "block",
                           }}
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
+                          preview={false}
+                          fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNFNUU3RUIiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzkwOTdBMSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlBob3RvPC90ZXh0Pjwvc3ZnPg=="
+                          placeholder={
+                            <div
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                background: "#f5f5f5",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <PictureOutlined
+                                style={{ fontSize: 32, color: "#ccc" }}
+                              />
+                            </div>
+                          }
                         />
                       </div>
                     </Col>

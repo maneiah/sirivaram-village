@@ -17,7 +17,14 @@ import {
 } from "react-icons/fa";
 import { FaHome, FaCalendarCheck, FaNewspaper } from "react-icons/fa";
 import { MdAccountBalanceWallet } from "react-icons/md";
+import {
+ 
+  FaCalendarAlt,
+  FaClock,
 
+  FaCreditCard,
+
+} from "react-icons/fa";
 const { Header, Sider, Content, Footer } = Layout;
 const { useBreakpoint } = Grid;
 
@@ -28,7 +35,7 @@ export default function UserPanelLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const displayName = localStorage.getItem("name") || "User";
+ 
 //   const displayMobile = localStorage.getItem("mobile") || "";
 
   // ✅ xs: collapse, md+: expand
@@ -51,33 +58,48 @@ const sidebarItems = useMemo(
   () => [
     {
       key: "/dashboard",
-      label: "Dashboard",
-      icon: <FaHome size={18} />, // 🏠 simple & user-friendly
+      label: "My Dashboard",
+      icon: <FaHome size={18} />, // 🏠 Home / overview
       link: "/dashboard",
     },
+
     {
       key: "/events",
-      label: "Events",
-      icon: <FaCalendarCheck size={18} />, // 📅 event-focused
+      label: "All Events",
+      icon: <FaCalendarAlt size={18} />, // 📅 All events
       link: "/events",
     },
-   
+
     {
-      key: "/gallery",
-      label: "Gallery",
-      icon: <FaImages size={18} />, // 🖼️ perfect fit
+      key: "/upcoming-events",
+      label: "Upcoming Events",
+      icon: <FaClock size={18} />, // ⏰ Upcoming / future
+      link: "/upcoming-events",
+    },
+
+    {
+      key: "/gallery-view",
+      label: "Village Gallery",
+      icon: <FaImages size={18} />, // 🖼️ Gallery
       link: "/gallery-view",
     },
+
+    {
+      key: "/payments",
+      label: "My Payments",
+      icon: <FaCreditCard size={18} />, // 💳 Payments (correct icon)
+      link: "/payments",
+    },
+
     {
       key: "/blogs",
-      label: "Blogs",
-      icon: <FaNewspaper size={18} />, // 📰 readable content
+      label: "Village Blogs",
+      icon: <FaNewspaper size={18} />, // 📰 Blogs / news
       link: "/blogs",
     },
   ],
   [],
 );
-
   // ✅ Active key highlight (supports nested routes)
   const selectedKey = useMemo(() => {
     const path = location.pathname;
@@ -96,6 +118,7 @@ const sidebarItems = useMemo(
       "/payments": "My Payments",
       "/gallery": "Gallery",
       "/blogs": "Blogs",
+      "/upcoming-events": "Upcoming Events",
     }),
     [],
   );
@@ -308,25 +331,23 @@ const adminName = localStorage.getItem("name") || "Admin";
             <Breadcrumb items={breadcrumbItems} />
           </div>
 
-          {/* ✅ Move Welcome text HERE (main content top) */}
-          <div style={{ marginBottom: 14 }}>
+          {/* <div style={{ marginBottom: 14 }}>
             <div style={{ fontSize: 18, fontWeight: 900, color: "#111827" }}>
               Welcome to Sirivaram Village
             </div>
             <div style={{ fontSize: 13, color: "#6B7280", fontWeight: 600 }}>
               Hello, {displayName} 👋
             </div>
-          </div>
+          </div> */}
 
           {children}
         </Content>
 
-        {/* ✅ FOOTER */}
         <Footer
           style={{
             textAlign: "center",
             background: "#ffffff",
-            boxShadow: "0 -2px 6px rgba(0,0,0,0.1)",
+            boxShadow: "0 -2px 6px rgba(0,0,0,0.08)",
             marginLeft: screens.xs ? 0 : leftWidth,
           }}
         >

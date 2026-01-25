@@ -18,19 +18,21 @@ import {
   Modal,
   Image,
   Tag,
-  Tooltip,
+  Divider,
 } from "antd";
 
 import {
   ReloadOutlined,
   SearchOutlined,
-  EyeOutlined,
-  PlayCircleOutlined,
-  PictureOutlined,
   CalendarOutlined,
+  PictureOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text, Paragraph } = Typography;
+
+// Brand colors (consistent with Events & Dashboard)
+const BTN_GREEN = "#1ab394";
+const BTN_BLUE = "#008cba";
 
 const API_URL = "https://sirivaram-backed.onrender.com/api/blogs";
 
@@ -41,11 +43,19 @@ export default function Blogs() {
 
   // UI controls
   const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
   const [sortBy, setSortBy] = useState("new"); // new | old
 
-  // image modal
+  // Image preview modal
   const [imgOpen, setImgOpen] = useState(false);
   const [imgUrl, setImgUrl] = useState("");
+  const [imgTitle, setImgTitle] = useState("");
+
+  // Debounce search for better performance
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQ(q.trim().toLowerCase()), 250);
+    return () => clearTimeout(t);
+  }, [q]);
 
   const extractArray = (payload) => {
     if (Array.isArray(payload)) return payload;
@@ -60,14 +70,14 @@ export default function Blogs() {
     try {
       setError("");
       setLoading(true);
-
       const res = await axios.get(API_URL);
       const list = extractArray(res.data);
-
-      setBlogs(list);
+      setBlogs(Array.isArray(list) ? list : []);
     } catch (err) {
       setBlogs([]);
-      setError(err?.response?.data?.message || err?.message || "Unable to load blogs");
+      setError(
+        err?.response?.data?.message || err?.message || "Unable to load blogs",
+      );
     } finally {
       setLoading(false);
     }
@@ -78,11 +88,14 @@ export default function Blogs() {
   }, []);
 
   const filteredBlogs = useMemo(() => {
-    const query = q.trim().toLowerCase();
-
     let list = Array.isArray(blogs) ? [...blogs] : [];
 
-    // search
+    // Filter only active blogs
+    list = list.filter((b) => b.isActive !== false);
+
+    const query = debouncedQ;
+
+    // Search by title or description
     if (query) {
       list = list.filter((b) => {
         const t = (b.title || "").toLowerCase();
@@ -91,7 +104,7 @@ export default function Blogs() {
       });
     }
 
-    // sort
+    // Sort by createdAt
     list.sort((a, b) => {
       const da = dayjs(a.createdAt).valueOf();
       const db = dayjs(b.createdAt).valueOf();
@@ -99,44 +112,76 @@ export default function Blogs() {
     });
 
     return list;
-  }, [blogs, q, sortBy]);
+  }, [blogs, debouncedQ, sortBy]);
 
-  const openImage = (url) => {
+  const openImage = (url, title) => {
     if (!url) return;
     setImgUrl(url);
+    setImgTitle(title || "Blog Image");
     setImgOpen(true);
-  };
-
-  const openVideo = (url) => {
-    if (!url) return;
-    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
     <UserLayout>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        {/* Header */}
-        <Row gutter={[12, 12]} align="middle" justify="space-between">
-          <Col xs={24} md={12}>
-            <Space direction="vertical" size={2}>
-              <Title level={3} style={{ margin: 0 }}>
-                Blogs
-              </Title>
-              <Text type="secondary">
-                Explore the latest updates. Search, preview images, and open videos.
-              </Text>
-            </Space>
-          </Col>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 12px" }}>
+        {/* Header Card */}
+        <Card
+          style={{
+            borderRadius: 18,
+            marginTop: 8,
+            boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
+          }}
+          bodyStyle={{ padding: 16 }}
+        >
+          <Row gutter={[12, 12]} align="middle" justify="space-between">
+            <Col xs={24} md={14}>
+              <Space direction="vertical" size={4}>
+                <Title level={3} style={{ margin: 0 }}>
+                  Latest Blogs & Updates
+                </Title>
+                <Text type="secondary">
+                  Explore community updates with previews and full-size images.
+                </Text>
+              </Space>
+            </Col>
 
-          <Col xs={24} md={12} style={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button icon={<ReloadOutlined />} onClick={loadBlogs} loading={loading}>
-              Refresh
-            </Button>
-          </Col>
-        </Row>
+            <Col
+              xs={24}
+              md={10}
+              style={{ display: "flex", justifyContent: "flex-end" }}
+            >
+              <Space wrap>
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={loadBlogs}
+                  loading={loading}
+                  style={{
+                    borderRadius: 10,
+                    borderColor: BTN_GREEN,
+                    color: BTN_GREEN,
+                  }}
+                >
+                  Refresh
+                </Button>
+                <Tag
+                  style={{
+                    borderRadius: 999,
+                    padding: "4px 10px",
+                    marginInlineEnd: 0,
+                    background: "#f6ffed",
+                    borderColor: "#b7eb8f",
+                    color: "#389e0d",
+                  }}
+                >
+                  Showing: <b>{filteredBlogs.length}</b>
+                </Tag>
+              </Space>
+            </Col>
+          </Row>
 
-        {/* Filters */}
-        <Card style={{ marginTop: 12, borderRadius: 16 }} bodyStyle={{ padding: 14 }}>
+          <Divider style={{ margin: "14px 0" }} />
+
+          {/* Filters */}
           <Row gutter={[12, 12]} align="middle">
             <Col xs={24} md={14}>
               <Input
@@ -144,11 +189,12 @@ export default function Blogs() {
                 onChange={(e) => setQ(e.target.value)}
                 allowClear
                 prefix={<SearchOutlined />}
-                placeholder="Search blogs by title or description..."
+                placeholder="Search by title or description..."
+                style={{ borderRadius: 12, height: 40 }}
               />
             </Col>
 
-            <Col xs={24} md={6}>
+            <Col xs={24} md={10}>
               <Select
                 value={sortBy}
                 onChange={setSortBy}
@@ -159,25 +205,28 @@ export default function Blogs() {
                 ]}
               />
             </Col>
-
-            <Col xs={24} md={4} style={{ textAlign: "right" }}>
-              <Text type="secondary">
-                Showing <b>{filteredBlogs.length}</b>
-              </Text>
-            </Col>
           </Row>
         </Card>
 
-        {/* States */}
+        {/* Error */}
         {error && !loading && (
           <Alert
-            style={{ marginTop: 12, borderRadius: 12 }}
+            style={{ marginTop: 12, borderRadius: 14 }}
             type="error"
             message="Unable to load blogs"
             description={
               <Space direction="vertical" size={8}>
                 <Text>{error}</Text>
-                <Button onClick={loadBlogs} icon={<ReloadOutlined />}>
+                <Button
+                  onClick={loadBlogs}
+                  icon={<ReloadOutlined />}
+                  style={{
+                    borderRadius: 10,
+                    background: BTN_GREEN,
+                    borderColor: BTN_GREEN,
+                    color: "#fff",
+                  }}
+                >
                   Try again
                 </Button>
               </Space>
@@ -186,132 +235,119 @@ export default function Blogs() {
           />
         )}
 
+        {/* Empty */}
         {!error && !loading && filteredBlogs.length === 0 && (
           <Card style={{ marginTop: 12, borderRadius: 16 }}>
             <Empty description="No blogs found" />
           </Card>
         )}
 
-        {/* Grid */}
+        {/* Blogs Grid */}
         <Row gutter={[12, 12]} style={{ marginTop: 12 }}>
           {loading
             ? Array.from({ length: 8 }).map((_, i) => (
                 <Col key={i} xs={24} sm={12} lg={8}>
                   <Card style={{ borderRadius: 16 }}>
-                    <Skeleton.Image active style={{ width: "100%", height: 160 }} />
+                    <Skeleton.Image
+                      active
+                      style={{ width: "100%", height: 200 }}
+                    />
                     <div style={{ marginTop: 12 }}>
-                      <Skeleton active paragraph={{ rows: 3 }} />
+                      <Skeleton active paragraph={{ rows: 4 }} />
                     </div>
                   </Card>
                 </Col>
               ))
             : filteredBlogs.map((b) => {
                 const hasImage = !!b.imageUrl;
-                const hasVideo = !!b.videoUrl;
                 const created = dayjs(b.createdAt);
 
                 return (
                   <Col key={b.id} xs={24} sm={12} lg={8}>
                     <Card
                       hoverable
-                      style={{ borderRadius: 16, height: "100%" }}
-                      bodyStyle={{ padding: 14, display: "flex", flexDirection: "column" }}
+                      style={{
+                        borderRadius: 16,
+                        height: "100%",
+                        boxShadow: "0 6px 18px rgba(0,0,0,0.05)",
+                      }}
+                      bodyStyle={{
+                        padding: 14,
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
                       cover={
                         hasImage ? (
-                          <div style={{ position: "relative" }}>
+                          <div
+                            style={{
+                              cursor: "pointer",
+                              borderRadius: "16px 16px 0 0",
+                              overflow: "hidden",
+                            }}
+                            onClick={() => openImage(b.imageUrl, b.title)}
+                          >
                             <Image
                               preview={false}
                               src={b.imageUrl}
-                              alt="blog"
-                              style={{ width: "100%", height: 180, objectFit: "cover" }}
+                              alt={b.title || "Blog cover"}
+                              style={{
+                                width: "100%",
+                                height: 200,
+                                objectFit: "cover",
+                              }}
                               fallback="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect width='100%25' height='100%25' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='24'%3ENo Image%3C/text%3E%3C/svg%3E"
                             />
-                            {hasVideo && (
-                              <Tag
-                                color="purple"
-                                style={{
-                                  position: "absolute",
-                                  top: 10,
-                                  left: 10,
-                                  borderRadius: 999,
-                                  fontWeight: 700,
-                                }}
-                              >
-                                VIDEO
-                              </Tag>
-                            )}
                           </div>
                         ) : (
                           <div
                             style={{
-                              height: 180,
+                              height: 200,
                               background: "#f3f4f6",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
                               color: "#9ca3af",
+                              fontSize: 18,
                               fontWeight: 700,
+                              borderRadius: "16px 16px 0 0",
                             }}
                           >
                             <Space>
-                              <PictureOutlined />
+                              <PictureOutlined style={{ fontSize: 32 }} />
                               No Image
                             </Space>
                           </div>
                         )
                       }
                     >
-                      <Space direction="vertical" size={8} style={{ width: "100%" }}>
-                        <Text style={{ fontSize: 16, fontWeight: 800 }} ellipsis>
-                          {b.title || "Blog"}
+                      <Space
+                        direction="vertical"
+                        size={12}
+                        style={{ width: "100%", flex: 1 }}
+                      >
+                        <Text
+                          style={{ fontSize: 16, fontWeight: 800 }}
+                          ellipsis={{ tooltip: b.title }}
+                        >
+                          {b.title || "Untitled Blog"}
                         </Text>
 
-                        <Space size={8} style={{ color: "#6B7280" }}>
+                        <Space size={6} style={{ color: "#6B7280" }}>
                           <CalendarOutlined />
                           <Text type="secondary" style={{ fontSize: 12 }}>
-                            {created.isValid() ? created.format("DD MMM YYYY, hh:mm A") : "—"}
+                            {created.isValid()
+                              ? created.format("DD MMM YYYY, hh:mm A")
+                              : "—"}
                           </Text>
                         </Space>
 
                         <Paragraph
                           type="secondary"
+                          ellipsis={{ rows: 4 }}
                           style={{ marginBottom: 0, fontSize: 13 }}
-                          ellipsis={{ rows: 3 }}
                         >
-                          {b.description || "—"}
+                          {b.description || "No description available."}
                         </Paragraph>
-
-                        {/* Actions */}
-                        <div style={{ marginTop: "auto" }}>
-                          <Row gutter={[8, 8]}>
-                            <Col xs={12}>
-                              <Tooltip title={hasImage ? "Preview Image" : "No image available"}>
-                                <Button
-                                  block
-                                  icon={<EyeOutlined />}
-                                  onClick={() => openImage(b.imageUrl)}
-                                  disabled={!hasImage}
-                                >
-                                  Image
-                                </Button>
-                              </Tooltip>
-                            </Col>
-
-                            <Col xs={12}>
-                              <Tooltip title={hasVideo ? "Open Video" : "No video available"}>
-                                <Button
-                                  block
-                                  type="primary"
-                                  icon={<PlayCircleOutlined />}
-                                  onClick={() => openVideo(b.videoUrl)}
-                                  disabled={!hasVideo}
-                                >
-                                  Video
-                                </Button>
-                              </Tooltip>
-                            </Col>
-                          </Row>
-                        </div>
                       </Space>
                     </Card>
                   </Col>
@@ -320,20 +356,21 @@ export default function Blogs() {
         </Row>
       </div>
 
-      {/* Image Modal */}
+      {/* Image Preview Modal */}
       <Modal
         open={imgOpen}
         onCancel={() => setImgOpen(false)}
         footer={null}
-        title="Blog Image"
+        title={imgTitle}
         centered
+        width={800}
       >
         {imgUrl ? (
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Image
               src={imgUrl}
-              alt="blog"
-              style={{ borderRadius: 12, border: "1px solid #E5E7EB" }}
+              alt={imgTitle}
+              style={{ borderRadius: 12, maxWidth: "100%" }}
               width="100%"
             />
           </div>
