@@ -2,84 +2,48 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Image1 from "../assets/image1 (1).png";
 
 const FULL_TEXT = "Welcome to Sirivaram";
 
-const CAROUSEL_IMAGES = [
-  {
-    id: 1,
-    url: "https://images.pexels.com/photos/2831299/pexels-photo-2831299.jpeg",
-    alt: "Sirivaram village landscape",
-  },
-  {
-    id: 2,
-    url: "https://img.freepik.com/premium-photo/indian-agricultural-land-farming-indian-village-side_665346-17661.jpg",
-    alt: "Village agricultural fields",
-  },
-  {
-    id: 3,
-    url: "https://thumbs.dreamstime.com/b/indian-traditional-house-tiled-roof-palm-trees-sunset-rustic-rural-architecture-rice-fields-scenic-landscape-maharashtra-385626684.jpg",
-    alt: "Village traditional architecture",
-  },
-  {
-    id: 4,
-    url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzOc8vTZlKdo0GowZqmiCRza79TZWijWoojw&s",
-    alt: "Village community gathering",
-  },
-];
-
 export default function Hero() {
   const [displayedText, setDisplayedText] = useState("");
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
   const timerRef = useRef(null);
-  const carouselTimerRef = useRef(null);
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  // ✅ Smooth scroll helper (works even if user is on a different route)
   const smoothScrollTo = (e, sectionId) => {
     e.preventDefault();
 
-    // If not on home, navigate first
     if (location.pathname !== "/") {
       navigate("/" + sectionId);
-
-      // Wait for home page to render then scroll
       setTimeout(() => {
         const el = document.querySelector(sectionId);
         if (el) {
-          const yOffset = -90; // header offset
+          const yOffset = -90;
           const y =
             el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-
           window.scrollTo({ top: y, behavior: "smooth" });
         }
       }, 200);
-
       return;
     }
 
-    // Already on home → scroll directly
     const el = document.querySelector(sectionId);
     if (el) {
       const yOffset = -90;
       const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-
       window.scrollTo({ top: y, behavior: "smooth" });
       window.history.replaceState(null, "", sectionId);
     }
   };
 
-  // Typing effect
   useEffect(() => {
     const reduceMotion = window.matchMedia?.(
       "(prefers-reduced-motion: reduce)",
-    ).matches;
-
+    )?.matches;
     if (reduceMotion) {
       setDisplayedText(FULL_TEXT);
       return;
@@ -87,8 +51,7 @@ export default function Hero() {
 
     if (displayedText.length < FULL_TEXT.length) {
       timerRef.current = setTimeout(() => {
-        const nextLen = displayedText.length + 1;
-        setDisplayedText(FULL_TEXT.slice(0, nextLen));
+        setDisplayedText(FULL_TEXT.slice(0, displayedText.length + 1));
       }, 80);
     }
 
@@ -97,95 +60,31 @@ export default function Hero() {
     };
   }, [displayedText]);
 
-  // Background carousel
-  useEffect(() => {
-    carouselTimerRef.current = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % CAROUSEL_IMAGES.length);
-    }, 5000);
-
-    return () => {
-      if (carouselTimerRef.current) clearInterval(carouselTimerRef.current);
-    };
-  }, []);
-
-  const handlePrevImage = () => {
-    setCurrentImageIndex(
-      (prev) => (prev - 1 + CAROUSEL_IMAGES.length) % CAROUSEL_IMAGES.length,
-    );
-  };
-
-  const handleNextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % CAROUSEL_IMAGES.length);
-  };
-
   return (
-    <section className="relative w-full h-screen flex items-center justify-center overflow-hidden pt-16">
-      {/* Background carousel */}
+    <section className="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden pt-16">
+      {/* ✅ ONE image only */}
       <div className="absolute inset-0 w-full h-full">
-        {CAROUSEL_IMAGES.map((image, idx) => (
-          <div
-            key={image.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              idx === currentImageIndex ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <img
-              src={image.url || "/placeholder.svg"}
-              alt={image.alt}
-              className="w-full h-full object-cover"
-              decoding="async"
-              loading="lazy"
-            />
-          </div>
-        ))}
+        <img
+          src={Image1}
+          alt="Sirivaram village background"
+          className="absolute inset-0 w-full h-full object-fill"
+          loading="eager"
+          decoding="async"
+        />
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/55 to-amber-900/70" />
-      </div>
-
-      {/* Carousel arrows */}
-      <button
-        onClick={handlePrevImage}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-        aria-label="Previous image"
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
-
-      <button
-        onClick={handleNextImage}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-        aria-label="Next image"
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
-
-      {/* Slide dots */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-        {CAROUSEL_IMAGES.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setCurrentImageIndex(idx)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              idx === currentImageIndex
-                ? "bg-amber-300 w-8"
-                : "bg-white/60 hover:bg-white"
-            }`}
-            aria-label={`Go to slide ${idx + 1}`}
-            aria-current={idx === currentImageIndex ? "true" : "false"}
-          />
-        ))}
+        {/* Overlay for text */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/70" />
       </div>
 
       {/* Hero content */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 py-16">
         <h1
-          className="text-4xl sm:text-5xl lg:text-7xl font-extrabold mb-6 
-                     bg-gradient-to-r from-amber-200 via-amber-300 to-amber-100 
-                     bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(0,0,0,0.7)]"
+          className="text-4xl sm:text-5xl lg:text-7xl font-extrabold mb-6 drop-shadow-[0_0_25px_rgba(0,0,0,0.85)]"
           aria-live="polite"
         >
-          {displayedText}
+          <span className="bg-gradient-to-r from-amber-200 via-amber-300 to-amber-100 bg-clip-text text-transparent">
+            {displayedText}
+          </span>
           {displayedText.length < FULL_TEXT.length && (
             <span className="animate-pulse text-amber-200" aria-hidden="true">
               |
@@ -193,7 +92,7 @@ export default function Hero() {
           )}
         </h1>
 
-        <p className="text-lg sm:text-xl lg:text-2xl text-amber-50/90 mb-8 leading-relaxed max-w-2xl drop-shadow-md">
+        <p className="text-lg sm:text-xl lg:text-2xl text-white/90 mb-8 leading-relaxed max-w-2xl drop-shadow-md">
           Discover the spiritual heritage and rich cultural tapestry of
           Sirivaram, a historic village known for its magnificent temple
           dedicated to Lord Shiva. Experience authentic traditions, warm
@@ -201,23 +100,20 @@ export default function Hero() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          {/* ✅ Use navigate instead of <a href> to avoid reload */}
           <button
             onClick={() => navigate("/register")}
             className="px-8 py-3 bg-amber-600 text-white rounded-lg font-semibold 
                        hover:bg-amber-700 transition-all shadow-md hover:shadow-lg
                        focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-            aria-label="Create your account and get started"
           >
             Get Started
           </button>
 
           <button
             onClick={(e) => smoothScrollTo(e, "#about")}
-            className="px-8 py-3 border-2 border-amber-200/80 text-amber-50 rounded-lg 
-                       font-semibold bg-white/5 hover:bg-white/10 transition-all
-                       focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
-            aria-label="Learn more about Sirivaram"
+            className="px-8 py-3 border-2 border-white/80 text-white rounded-lg 
+                       font-semibold bg-white/10 hover:bg-white/20 transition-all
+                       focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             Learn More
           </button>

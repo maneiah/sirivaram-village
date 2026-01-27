@@ -1,12 +1,23 @@
+// src/components/FaqWithImage.jsx
 import React, { useEffect } from "react";
-import { Accordion, Container, Grid, Image, Title } from "@mantine/core";
+import {
+  Accordion,
+  Container,
+  Grid,
+  Image,
+  Title,
+  Text,
+  Box,
+  Badge,
+  Button,
+  Stack,
+} from "@mantine/core";
 import { useLocation } from "react-router-dom";
 import image from "../assets/image.b0c2306b.png";
 
 export default function FaqWithImage() {
   const location = useLocation();
 
-  // ✅ Auto-scroll when URL is "/#faq"
   useEffect(() => {
     if (location.hash !== "#faq") return;
 
@@ -14,7 +25,7 @@ export default function FaqWithImage() {
     if (!el) return;
 
     setTimeout(() => {
-      const yOffset = -90; // header offset
+      const yOffset = -90;
       const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
     }, 150);
@@ -24,86 +35,158 @@ export default function FaqWithImage() {
     <section
       id="faq"
       aria-label="Frequently Asked Questions about Sirivaram Village"
-      className="py-16 bg-gray-50"
+      className="py-16 md:py-20 bg-gradient-to-b from-gray-50 via-white to-gray-50"
     >
       <Container size="lg">
-        <Grid gutter={50}>
+        <Grid gutter={{ base: 28, md: 50 }} align="center">
           {/* Left Image */}
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <Image
-              src={image}
-              alt="Sirivaram Village FAQs"
-              radius="md"
-              withPlaceholder
-            />
+            <Box
+              className="rounded-2xl overflow-hidden border border-amber-200 shadow-sm bg-white"
+              aria-label="FAQ illustration image"
+            >
+              {/* ✅ NO CROP on mobile: contain + auto height */}
+              <Image
+                src={image}
+                alt="Sirivaram Village FAQs"
+                radius={0}
+                fit="contain"
+                w="100%"
+                fallbackSrc="https://placehold.co/800x600?text=Sirivaram+FAQ"
+                styles={{
+                  root: { background: "white" },
+                  image: {
+                    width: "100%",
+                    height: "auto",
+                    maxHeight: 420, // desktop max height
+                    objectFit: "contain",
+                  },
+                }}
+              />
+            </Box>
+
+            <Box className="mt-4 rounded-2xl border border-amber-200 bg-white p-5 shadow-sm">
+              <Text fw={700} c="rgb(120,53,15)">
+                Need more help?
+              </Text>
+              <Text size="sm" c="dimmed" mt={6}>
+                If you have any questions about Sirivaram or the temple events,
+                feel free to contact us.
+              </Text>
+              <Button
+                mt={12}
+                radius="xl"
+                size="sm"
+                className="bg-amber-800 hover:bg-amber-900"
+                onClick={() => {
+                  const el = document.querySelector("#contact");
+                  if (el) {
+                    const yOffset = -90;
+                    const y =
+                      el.getBoundingClientRect().top +
+                      window.pageYOffset +
+                      yOffset;
+                    window.scrollTo({ top: y, behavior: "smooth" });
+                  }
+                }}
+              >
+                Contact Us
+              </Button>
+            </Box>
           </Grid.Col>
 
           {/* Right FAQ */}
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <Title
-              order={2}
-              className="mb-6 text-2xl font-semibold text-amber-900"
-            >
-              Frequently Asked Questions (Sirivaram Village)
-            </Title>
+            <Stack gap="sm">
+              <Badge color="yellow" variant="light" radius="xl" w="fit-content">
+                FAQ
+              </Badge>
 
-            <Accordion
-              chevronPosition="right"
-              defaultValue="location"
-              variant="separated"
-            >
-              <Accordion.Item value="location">
-                <Accordion.Control>
-                  Where is Sirivaram located?
-                </Accordion.Control>
-                <Accordion.Panel>
-                  Sirivaram village is located in <b>Penagalur Mandal</b>,{" "}
-                  <b>Kadapa District</b>, Andhra Pradesh. It falls under{" "}
-                  <b>Kodur Panchayathi</b> and is near the town of{" "}
-                  <b>Rajampet</b>.
-                </Accordion.Panel>
-              </Accordion.Item>
+              <Title
+                order={2}
+                className="text-3xl sm:text-4xl font-extrabold text-amber-900"
+              >
+                Frequently Asked Questions
+              </Title>
 
-              <Accordion.Item value="pincode">
-                <Accordion.Control>
-                  What is the pincode of Sirivaram?
-                </Accordion.Control>
-                <Accordion.Panel>
-                  The pincode for Sirivaram village is <b>516271</b>.
-                </Accordion.Panel>
-              </Accordion.Item>
+              <Text className="text-gray-700 text-sm sm:text-base leading-relaxed">
+                Quick answers about Sirivaram village location, pincode,
+                population, literacy, and temples.
+              </Text>
 
-              <Accordion.Item value="population">
-                <Accordion.Control>
-                  What is the population of Sirivaram?
-                </Accordion.Control>
-                <Accordion.Panel>
-                  As per the 2011 Census, Sirivaram has a population of{" "}
-                  <b>720</b> people.
-                </Accordion.Panel>
-              </Accordion.Item>
+              <Accordion
+                chevronPosition="right"
+                defaultValue="location"
+                variant="separated"
+                radius="lg"
+                styles={{
+                  item: {
+                    border: "1px solid #fde68a",
+                    backgroundColor: "white",
+                  },
+                  control: {
+                    fontWeight: 700,
+                    color: "#78350f",
+                  },
+                  panel: {
+                    color: "#374151",
+                    lineHeight: 1.6,
+                  },
+                }}
+              >
+                <Accordion.Item value="location">
+                  <Accordion.Control>
+                    Where is Sirivaram located?
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    Sirivaram village is located in <b>Penagalur Mandal</b>,{" "}
+                    <b>Kadapa District</b>, Andhra Pradesh. It falls under{" "}
+                    <b>Kodur Panchayathi</b> and is near the town of{" "}
+                    <b>Rajampet</b>.
+                  </Accordion.Panel>
+                </Accordion.Item>
 
-              <Accordion.Item value="literacy">
-                <Accordion.Control>
-                  What is the literacy rate in Sirivaram?
-                </Accordion.Control>
-                <Accordion.Panel>
-                  The overall literacy rate in Sirivaram is <b>41.39%</b>{" "}
-                  according to 2011 Census data.
-                </Accordion.Panel>
-              </Accordion.Item>
+                <Accordion.Item value="pincode">
+                  <Accordion.Control>
+                    What is the pincode of Sirivaram?
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    The pincode for Sirivaram village is <b>516271</b>.
+                  </Accordion.Panel>
+                </Accordion.Item>
 
-              <Accordion.Item value="temple">
-                <Accordion.Control>
-                  What temples are there in Sirivaram?
-                </Accordion.Control>
-                <Accordion.Panel>
-                  Sirivaram is famous for its <b>ancient Lord Shiva Temple</b>{" "}
-                  and other small local temples. These temples host festivals
-                  like <b>Shivaratri</b> and <b>Deepavali</b>.
-                </Accordion.Panel>
-              </Accordion.Item>
-            </Accordion>
+                <Accordion.Item value="population">
+                  <Accordion.Control>
+                    What is the population of Sirivaram?
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    As per the 2011 Census, Sirivaram has a population of{" "}
+                    <b>720</b> people.
+                  </Accordion.Panel>
+                </Accordion.Item>
+
+                <Accordion.Item value="literacy">
+                  <Accordion.Control>
+                    What is the literacy rate in Sirivaram?
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    The overall literacy rate in Sirivaram is <b>41.39%</b>{" "}
+                    according to 2011 Census data.
+                  </Accordion.Panel>
+                </Accordion.Item>
+
+                <Accordion.Item value="temple">
+                  <Accordion.Control>
+                    What temples are there in Sirivaram?
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    Sirivaram is famous for its <b>ancient Lord Shiva Temple</b>{" "}
+                    and other small local temples. These temples host festivals
+                    like <b>Shivaratri</b> and <b>Deepavali</b>.
+                  </Accordion.Panel>
+                </Accordion.Item>
+              </Accordion>
+            </Stack>
           </Grid.Col>
         </Grid>
       </Container>

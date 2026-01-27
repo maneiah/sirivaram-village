@@ -1,7 +1,7 @@
 // src/components/Gallery.jsx
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const galleryImages = [
@@ -66,6 +66,9 @@ const galleryImages = [
 export default function Gallery() {
   const location = useLocation();
 
+  const [activeCategory] = useState("All");
+  const [selected, setSelected] = useState(null);
+
   // ✅ Auto scroll when URL is "/#gallery"
   useEffect(() => {
     if (location.hash !== "#gallery") return;
@@ -74,57 +77,76 @@ export default function Gallery() {
     if (!el) return;
 
     setTimeout(() => {
-      const yOffset = -90; // header height
+      const yOffset = -90;
       const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
     }, 150);
   }, [location.hash]);
 
+  // ✅ Filtered images
+  const filteredImages = useMemo(() => {
+    if (activeCategory === "All") return galleryImages;
+    return galleryImages.filter((img) => img.category === activeCategory);
+  }, [activeCategory]);
+
+  // ✅ Close modal on ESC
+  useEffect(() => {
+    if (!selected) return;
+    const onKey = (e) => e.key === "Escape" && setSelected(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected]);
+
   return (
     <section
       id="gallery"
-      className="px-4 sm:px-6 lg:px-8 bg-white py-16"
+      className="px-4 sm:px-6 lg:px-8 py-16 md:py-20 bg-gradient-to-b from-white via-amber-50 to-white"
       aria-labelledby="gallery-heading"
     >
       <div className="max-w-7xl mx-auto">
-        {/* Heading */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
-          <div>
-            <h2
-              id="gallery-heading"
-              className="text-3xl sm:text-4xl font-extrabold text-amber-900 mb-2"
-            >
-              Gallery
-            </h2>
-            <p className="text-gray-700 text-sm sm:text-base max-w-xl">
-              A small glimpse of Sirivaram’s temple, fields, festivals and
-              everyday village life.
-            </p>
-          </div>
-
-          <Link
-            to="/gallery"
-            className="inline-block bg-amber-700 hover:bg-amber-800 text-white text-sm font-semibold py-2.5 px-6 rounded-lg shadow-sm transition-colors"
+        {/* ✅ CENTER Heading like Blog */}
+        <div className="flex flex-col gap-4 mb-10 text-center md:mx-auto max-w-2xl">
+          <h2
+            id="gallery-heading"
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-amber-900"
           >
-            View Full Gallery
-          </Link>
+            Gallery
+          </h2>
+
+          <p className="text-gray-700 text-sm sm:text-base leading-relaxed">
+            A small glimpse of Sirivaram’s temple, fields, festivals and
+            everyday village life. Tap any image to view in full.
+          </p>
+
+          <div className="flex justify-center gap-3 mt-2">
+            <Link
+              to="/gallery"
+              className="inline-flex items-center justify-center bg-amber-800 hover:bg-amber-900 text-white text-sm font-semibold py-2.5 px-6 rounded-xl shadow-sm transition"
+            >
+              View Full Gallery
+            </Link>
+          </div>
         </div>
 
         {/* Image Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {galleryImages.map((img) => (
-            <div
+          {filteredImages.map((img) => (
+            <button
               key={img.id}
-              className="relative rounded-2xl overflow-hidden bg-gray-100 shadow-sm hover:shadow-md transition-shadow"
+              onClick={() => setSelected(img)}
+              className="group relative rounded-2xl overflow-hidden bg-gray-100 shadow-sm hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+              aria-label={`Open image: ${img.title}`}
             >
               <img
                 src={img.image || "/placeholder.svg"}
                 alt={img.title}
-                className="w-full h-56 object-cover"
+                className="w-full h-56 object-cover transform group-hover:scale-105 transition duration-500"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              <div className="absolute bottom-3 left-3 right-3">
+
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent opacity-95" />
+
+              <div className="absolute bottom-3 left-3 right-3 text-left">
                 <p className="text-xs uppercase tracking-wide text-amber-200">
                   {img.category}
                 </p>
@@ -132,10 +154,56 @@ export default function Gallery() {
                   {img.title}
                 </h3>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>
+
+      {/* ✅ Lightbox Modal */}
+      {selected && (
+        <>
+          <button
+            className="fixed inset-0 bg-black/70 z-50"
+            onClick={() => setSelected(null)}
+            aria-label="Close image preview backdrop"
+          />
+
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="bg-white rounded-2xl overflow-hidden shadow-2xl max-w-4xl w-full">
+              <div className="flex items-center justify-between px-4 py-3 border-b">
+                <div>
+                  <p className="text-xs text-amber-700 font-semibold uppercase tracking-wide">
+                    {selected.category}
+                  </p>
+                  <p className="text-lg font-extrabold text-amber-900">
+                    {selected.title}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setSelected(null)}
+                  className="px-3 py-2 rounded-lg hover:bg-gray-100"
+                  aria-label="Close preview"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="bg-black">
+                <img
+                  src={selected.image}
+                  alt={selected.title}
+                  className="w-full max-h-[75vh] object-contain"
+                />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </section>
   );
 }

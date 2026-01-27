@@ -2,30 +2,27 @@ import React from "react";
 
 export default function PageLoader() {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-      <div className="loader" aria-label="Loading content..."></div>
+    <div
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading Sirivaram website"
+    >
+      {/* Loader Ring */}
+      <div className="relative w-20 h-20 mb-4">
+        <div className="absolute inset-0 rounded-full border-4 border-amber-200"></div>
 
-      <style>{`
-        .loader {
-          width: 70px;
-          height: 70px;
-          border-radius: 50%;
-          border: 6px solid transparent;
-          border-top: 6px solid #008cba;
-          border-right: 6px solid #33b5e5;
-          border-left: 6px solid #006f9b;
-          animation: spin 0.8s linear infinite, glow 2s ease-in-out infinite;
-        }
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-amber-700 animate-spin"></div>
 
-        @keyframes spin {
-          100% { transform: rotate(360deg); }
-        }
+        {/* Inner pulse */}
+        <div className="absolute inset-3 rounded-full bg-amber-100 animate-pulse"></div>
+      </div>
 
-        @keyframes glow {
-          0%, 100% { filter: drop-shadow(0 0 2px #008cba); }
-          50% { filter: drop-shadow(0 0 10px #008cba); }
-        }
-      `}</style>
+      {/* Text */}
+      <h2 className="text-amber-900 font-semibold tracking-wide text-lg">
+        Loading Sirivaram
+      </h2>
+      <p className="text-sm text-gray-500 mt-1">Please wait…</p>
     </div>
   );
 }

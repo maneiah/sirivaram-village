@@ -8,10 +8,10 @@ export default function RootLayout() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <Header />
-      <main className="pt-12 md:pt-16 flex-1">
+      <main className="pt-16 md:pt-20 flex-1">
         <Outlet />
       </main>
-      <Footer  className="pt-12 md:pt-16" />
+      <Footer />
     </div>
   );
 }

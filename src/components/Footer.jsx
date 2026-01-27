@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Facebook, Instagram, ArrowUp } from "lucide-react";
 import { FaWhatsappSquare } from "react-icons/fa";
 import { IoLogoYoutube } from "react-icons/io";
@@ -8,6 +8,16 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [showTop, setShowTop] = useState(false);
+
+  // ✅ show back-to-top only after scroll
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 350);
+    window.addEventListener("scroll", onScroll);
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // ✅ smooth scroll helper (works from any route)
   const smoothScroll = (e, sectionId) => {
@@ -25,7 +35,7 @@ export default function Footer() {
             el.getBoundingClientRect().top + window.pageYOffset + yOffset;
           window.scrollTo({ top: y, behavior: "smooth" });
         }
-      }, 200);
+      }, 220);
 
       return;
     }
@@ -45,188 +55,234 @@ export default function Footer() {
     window.history.replaceState(null, "", location.pathname);
   };
 
+  // ✅ JSON-LD schema (memo so it doesn't recreate each render)
+  const orgSchema = useMemo(
+    () => ({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Sirivaram Village",
+      url: "https://sirivaram-village.vercel.app",
+      logo: "https://sirivaram-village.vercel.app/favicon.png",
+      sameAs: [
+        "https://facebook.com",
+        "https://instagram.com",
+        "https://wa.me/917093485208",
+        "https://youtube.com",
+      ],
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: "sirivaram@gmail.com",
+        telephone: "+91 70934 85208",
+        contactType: "customer support",
+      },
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Sirivaram Village, Penagaluru Mandal",
+        addressLocality: "Sirivaram",
+        addressRegion: "Annamayya District",
+        addressCountry: "IN",
+      },
+    }),
+    [],
+  );
+
   return (
-    <footer className="bg-amber-900 text-white py-12 px-4 sm:px-6 lg:px-8 relative">
-      <div className="max-w-7xl mx-auto">
+    <footer className="relative bg-amber-950 text-white">
+      {/* Top glow / divider */}
+      <div className="h-1 w-full bg-gradient-to-r from-amber-700 via-amber-500 to-amber-700" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         {/* Top grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          {/* Logo / Brand */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          {/* Brand */}
           <div>
-            <div className="w-14 h-14 rounded-xl bg-amber-800 flex items-center justify-center p-2 shadow-sm">
-              {/* Village SVG Icon */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 350 350"
-                className="w-10 h-10 brightness-0 invert"
-              >
-                {/* House */}
-                <g transform="translate(75,110)">
-                  <rect
-                    x="40"
-                    y="80"
-                    width="80"
-                    height="70"
-                    rx="6"
-                    fill="#FFDD66"
-                  />
-                  <path d="M30 90 L80 40 L130 90 Z" fill="#F28C28" />
-                  <rect
-                    x="75"
-                    y="110"
-                    width="20"
-                    height="40"
-                    rx="4"
-                    fill="#8B5A00"
-                  />
-                </g>
-
-                {/* Tree */}
-                <g transform="translate(200,80)">
-                  <circle cx="40" cy="40" r="30" fill="#7ED957" />
-                  <rect
-                    x="33"
-                    y="60"
-                    width="14"
-                    height="40"
-                    rx="3"
-                    fill="#5C3B00"
-                  />
-                </g>
-
-                {/* Book */}
-                <path
-                  d="M60 230 q30 -20 60 0 t60 0"
-                  fill="#fff"
-                  stroke="#1B4A90"
-                  strokeWidth="6"
-                />
-
-                {/* Gear */}
-                <g transform="translate(210,210) scale(0.8)">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center shadow-sm border border-white/10">
+                {/* Village SVG Icon */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 350 350"
+                  className="w-9 h-9 brightness-0 invert"
+                >
+                  <g transform="translate(75,110)">
+                    <rect
+                      x="40"
+                      y="80"
+                      width="80"
+                      height="70"
+                      rx="6"
+                      fill="#FFDD66"
+                    />
+                    <path d="M30 90 L80 40 L130 90 Z" fill="#F28C28" />
+                    <rect
+                      x="75"
+                      y="110"
+                      width="20"
+                      height="40"
+                      rx="4"
+                      fill="#8B5A00"
+                    />
+                  </g>
+                  <g transform="translate(200,80)">
+                    <circle cx="40" cy="40" r="30" fill="#7ED957" />
+                    <rect
+                      x="33"
+                      y="60"
+                      width="14"
+                      height="40"
+                      rx="3"
+                      fill="#5C3B00"
+                    />
+                  </g>
                   <path
-                    d="M50 0 L60 0 L70 20 L90 20 L100 40 L90 60 L100 80 L90 100 L70 100 L60 120 L50 120 L40 100 L20 100 L10 80 L20 60 L10 40 L20 20 L40 20 Z"
-                    fill="#F0F0F0"
-                    stroke="#C4C4C4"
-                    strokeWidth="5"
+                    d="M60 230 q30 -20 60 0 t60 0"
+                    fill="#fff"
+                    stroke="#1B4A90"
+                    strokeWidth="6"
                   />
-                  <circle cx="55" cy="60" r="22" fill="#0A6CC7" />
-                </g>
+                  <g transform="translate(210,210) scale(0.8)">
+                    <path
+                      d="M50 0 L60 0 L70 20 L90 20 L100 40 L90 60 L100 80 L90 100 L70 100 L60 120 L50 120 L40 100 L20 100 L10 80 L20 60 L10 40 L20 20 L40 20 Z"
+                      fill="#F0F0F0"
+                      stroke="#C4C4C4"
+                      strokeWidth="5"
+                    />
+                    <circle cx="55" cy="60" r="22" fill="#0A6CC7" />
+                  </g>
+                  <path
+                    d="M260 150 C300 140, 330 180, 260 230 C240 210, 230 170, 260 150"
+                    fill="#5CC165"
+                  />
+                  <path
+                    d="M40 260 C100 300, 200 200, 310 260"
+                    stroke="#FFFFFF"
+                    strokeWidth="14"
+                    fill="none"
+                    opacity="0.9"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
 
-                {/* Leaf */}
-                <path
-                  d="M260 150 C300 140, 330 180, 260 230 C240 210, 230 170, 260 150"
-                  fill="#5CC165"
-                />
-
-                {/* River */}
-                <path
-                  d="M40 260 C100 300, 200 200, 310 260"
-                  stroke="#FFFFFF"
-                  strokeWidth="14"
-                  fill="none"
-                  opacity="0.9"
-                  strokeLinecap="round"
-                />
-              </svg>
+              <div>
+                <h2 className="font-extrabold text-lg tracking-wide">
+                  SIRIVARAM
+                </h2>
+                <p className="text-xs text-amber-100/80">
+                  Heritage • Culture • Community
+                </p>
+              </div>
             </div>
 
-            <h2 className="font-bold text-lg tracking-wide mt-3">Sirivaram</h2>
-            <p className="text-amber-100 text-sm mt-2 leading-relaxed">
-              Preserving heritage, celebrating culture and welcoming devotees
+            <p className="text-amber-100/90 text-sm mt-4 leading-relaxed">
+              Preserving heritage, celebrating culture, and welcoming devotees
               and visitors to our village temple.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h2 className="font-semibold mb-4 text-amber-50 text-sm uppercase tracking-wide">
+            <h3 className="text-sm uppercase tracking-wider text-amber-100/90 font-semibold mb-4">
               Quick Links
-            </h2>
-
-            <ul className="space-y-2 text-amber-100 text-sm">
+            </h3>
+            <ul className="space-y-3 text-sm text-amber-100/85">
               <li>
-                <a
-                  href="/#about"
+                <Link
+                  to="/#about"
                   onClick={(e) => smoothScroll(e, "#about")}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-white transition"
                 >
                   About
-                </a>
+                </Link>
               </li>
               <li>
-                {/* ✅ FIXED: blog id is #blog (not #blogs) */}
-                <a
-                  href="/#blog"
+                <Link
+                  to="/#blog"
                   onClick={(e) => smoothScroll(e, "#blog")}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-white transition"
                 >
                   Blogs
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/#gallery"
+                <Link
+                  to="/#gallery"
                   onClick={(e) => smoothScroll(e, "#gallery")}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-white transition"
                 >
                   Gallery
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/#faq"
+                <Link
+                  to="/#faq"
                   onClick={(e) => smoothScroll(e, "#faq")}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-white transition"
                 >
                   FAQ
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/#contact"
+                <Link
+                  to="/#contact"
                   onClick={(e) => smoothScroll(e, "#contact")}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-white transition"
                 >
                   Contact
-                </a>
+                </Link>
               </li>
-             
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h2 className="font-semibold mb-4 text-amber-50 text-sm uppercase tracking-wide">
+            <h3 className="text-sm uppercase tracking-wider text-amber-100/90 font-semibold mb-4">
               Contact
-            </h2>
-            <address className="not-italic text-amber-100 text-sm leading-relaxed">
-              Email:{" "}
-              <a href="mailto:sirivaram@gmail.com" className="hover:underline">
-                sirivaram@gmail.com
-              </a>
-              <br />
-              Phone: +91 70934 85208
-              <br />
-              Address: Sirivaram Village, Penagaluru Mandal,
-              <br />
-              Annamayya District, Andhra Pradesh
+            </h3>
+
+            <address className="not-italic text-amber-100/85 text-sm leading-relaxed space-y-2">
+              <div>
+                <span className="font-semibold text-amber-100">Email:</span>{" "}
+                <a
+                  href="mailto:sirivaram@gmail.com"
+                  className="hover:underline"
+                >
+                  sirivaram@gmail.com
+                </a>
+              </div>
+
+              <div>
+                <span className="font-semibold text-amber-100">Phone:</span>{" "}
+                <a href="tel:+917093485208" className="hover:underline">
+                  +91 70934 85208
+                </a>
+              </div>
+
+              <div>
+                <span className="font-semibold text-amber-100">Address:</span>
+                <div className="mt-1">
+                  Sirivaram Village, Penagaluru Mandal, <br />
+                  Annamayya District, Andhra Pradesh
+                </div>
+              </div>
             </address>
           </div>
 
-          {/* Social Icons */}
+          {/* Social */}
           <div>
-            <h2 className="font-semibold mb-4 text-amber-50 text-sm uppercase tracking-wide">
+            <h3 className="text-sm uppercase tracking-wider text-amber-100/90 font-semibold mb-4">
               Follow Us
-            </h2>
-            <p className="text-amber-100 text-sm mb-3">
+            </h3>
+            <p className="text-amber-100/85 text-sm mb-4 leading-relaxed">
               Stay connected with updates, events and stories from Sirivaram.
             </p>
+
             <div className="flex gap-3">
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-[#1877F2] flex items-center justify-center hover:brightness-110 transition-all transform hover:scale-110 shadow-md"
+                className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center hover:bg-white/15 transition transform hover:scale-105"
                 aria-label="Facebook"
               >
                 <Facebook className="w-5 h-5 text-white" />
@@ -236,7 +292,7 @@ export default function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-all transform hover:scale-110 shadow-md"
+                className="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center transition transform hover:scale-105"
                 aria-label="Instagram"
                 style={{
                   background:
@@ -250,7 +306,7 @@ export default function Footer() {
                 href="https://wa.me/917093485208"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center hover:brightness-110 transition-all transform hover:scale-110 shadow-md"
+                className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center hover:bg-white/15 transition transform hover:scale-105"
                 aria-label="WhatsApp"
               >
                 <FaWhatsappSquare className="w-5 h-5 text-white" />
@@ -260,7 +316,7 @@ export default function Footer() {
                 href="https://youtube.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-[#FF0000] flex items-center justify-center hover:brightness-110 transition-all transform hover:scale-110 shadow-md"
+                className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center hover:bg-white/15 transition transform hover:scale-105"
                 aria-label="YouTube"
               >
                 <IoLogoYoutube className="w-5 h-5 text-white" />
@@ -269,7 +325,28 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* ✅ Back to Top Button */}
+        {/* Bottom line */}
+        <div className="border-t border-white/10 pt-6 mt-10">
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+            <p className="text-amber-100/80 text-xs sm:text-sm">
+              © {currentYear} Sirivaram Village. All rights reserved.
+            </p>
+
+            <div className="text-amber-100/70 text-xs sm:text-sm">
+              Built with ❤️ for Sirivaram
+            </div>
+          </div>
+        </div>
+
+        {/* ✅ JSON-LD Organization Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
+      </div>
+
+      {/* ✅ Back to Top Button */}
+      {showTop && (
         <button
           onClick={backToTop}
           className="fixed bottom-6 right-6 z-50 bg-amber-700 hover:bg-amber-800 text-white w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
@@ -277,47 +354,7 @@ export default function Footer() {
         >
           <ArrowUp className="w-5 h-5" />
         </button>
-
-        {/* Bottom line */}
-        <div className="border-t border-amber-800 pt-6 mt-6">
-          <p className="text-center text-amber-100 text-xs sm:text-sm">
-            © {currentYear} Sirivaram Village. All rights reserved.
-          </p>
-        </div>
-
-        {/* JSON-LD Organization Schema */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Sirivaram Village",
-              url: "https://sirivaram-village.vercel.app",
-              logo: "https://sirivaram-village.vercel.app/favicon.png",
-              sameAs: [
-                "https://facebook.com",
-                "https://instagram.com",
-                "https://wa.me/917093485208",
-                "https://youtube.com",
-              ],
-              contactPoint: {
-                "@type": "ContactPoint",
-                email: "sirivaram@gmail.com",
-                telephone: "+91 70934 85208",
-                contactType: "customer support",
-              },
-              address: {
-                "@type": "PostalAddress",
-                streetAddress: "Sirivaram Village, Penagaluru Mandal",
-                addressLocality: "Sirivaram",
-                addressRegion: "Annamayya District",
-                addressCountry: "IN",
-              },
-            }),
-          }}
-        />
-      </div>
+      )}
     </footer>
   );
 }

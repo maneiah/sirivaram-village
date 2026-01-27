@@ -6,6 +6,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 import ProtectedRoute from "./Auth/ProtectedRoute.jsx";
+import PageLoader from "./components/PageLoader";
 
 // Protected pages
 import Events from "./Pages/Events.jsx";
@@ -19,21 +20,25 @@ import UpcomingEvents from "./Pages/UpcomingEvents.jsx";
 const Home = lazy(() => import("./Pages/Home.jsx"));
 const LoginPage = lazy(() => import("./Auth/Login.jsx"));
 const RegisterPage = lazy(() => import("./Auth/Register.jsx"));
-const AboutVillage = lazy(() => import("./Pages/AboutVillage.jsx"));
-const GalleryPage = lazy(() => import("./Pages/allGalleryImages.jsx"));
+// const AboutVillage = lazy(() => import("./Pages/AboutVillage.jsx"));
+// const GalleryPage = lazy(() => import("./Pages/allGalleryImages.jsx"));
 
-// Scroll to #hash (anchors)
 function ScrollToHash() {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.hash) {
-      const el = document.querySelector(location.hash);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }
-  }, [location.hash]); // ✅ updated dependency
+    if (!location.hash) return;
+
+    const el = document.querySelector(location.hash);
+    if (!el) return;
+
+    const yOffset = -90; // ✅ header offset
+    const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+    setTimeout(() => {
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }, 50);
+  }, [location.pathname, location.hash]);
 
   return null;
 }
@@ -45,7 +50,7 @@ export default function App() {
     AOS.init({ duration: 900, once: false });
   }, []);
 
-  // Scroll to top if no hash exists
+  // Scroll to top on route change if no hash
   useEffect(() => {
     if (!location.hash) window.scrollTo(0, 0);
   }, [location.pathname, location.hash]);
@@ -54,14 +59,16 @@ export default function App() {
     <>
       <ScrollToHash />
 
-      <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
+      <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* ✅ PUBLIC ROUTES */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+
           <Route element={<RootLayout />}>
             <Route path="/" element={<Home />} />
 
+            {/* Optional public pages */}
             {/* <Route path="/about-village" element={<AboutVillage />} />
             <Route path="/gallery" element={<GalleryPage />} /> */}
           </Route>
@@ -116,7 +123,7 @@ export default function App() {
             }
           />
 
-          {/* ✅ Optional: 404 */}
+          {/* ✅ 404 */}
           <Route path="*" element={<div className="p-6">Page Not Found</div>} />
         </Routes>
       </Suspense>
