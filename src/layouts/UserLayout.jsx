@@ -1,32 +1,49 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Layout, Menu, Row, Grid, Breadcrumb } from "antd";
+import {
+  Layout,
+  Menu,
+  Row,
+  Grid,
+  Breadcrumb,
+  Modal,
+  Form,
+  Input,
+  Col,
+  Button,
+  Space,
+  message,
+  Dropdown,
+  Avatar,
+  Divider,
+} from "antd";
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   HomeOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  ProfileOutlined,
+  GiftOutlined,
 } from "@ant-design/icons";
+import {MdLogout} from "react-icons/md";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SirivaramLogo from "../components/SirivaramLogo";
 
-import { MdLogout } from "react-icons/md";
-import { WalletOutlined } from "@ant-design/icons";
-import {
- 
-  FaImages,
-  
-} from "react-icons/fa";
-import { FaHome, FaCalendarCheck, FaNewspaper } from "react-icons/fa";
-import { MdAccountBalanceWallet } from "react-icons/md";
-import {
- 
-  FaCalendarAlt,
-  FaClock,
+import { FaImages, FaHome, FaNewspaper } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaCreditCard } from "react-icons/fa";
 
-  FaCreditCard,
-
-} from "react-icons/fa";
 const { Header, Sider, Content, Footer } = Layout;
 const { useBreakpoint } = Grid;
+
+const API_BASE = "https://sirivaram-backed.onrender.com";
+
+const safeStr = (v) => (v === null || v === undefined ? "" : String(v));
+
+const getLrCode = (id) => {
+  const clean = safeStr(id).replace(/-/g, "");
+  if (!clean) return "SV----";
+  return `SV${clean.slice(-4).toUpperCase()}`; // ✅ last 4 digits
+};
 
 export default function UserPanelLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -35,8 +52,14 @@ export default function UserPanelLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
 
- 
-//   const displayMobile = localStorage.getItem("mobile") || "";
+  // ✅ user profile from /api/users/me
+  const [meLoading, setMeLoading] = useState(true);
+  const [me, setMe] = useState(null);
+
+  // ✅ edit modal
+  const [editOpen, setEditOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form] = Form.useForm();
 
   // ✅ xs: collapse, md+: expand
   useEffect(() => {
@@ -46,61 +69,134 @@ export default function UserPanelLayout({ children }) {
 
   const toggleCollapse = () => setCollapsed((prev) => !prev);
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   const handleSignOut = () => {
     localStorage.clear();
     sessionStorage.clear();
     navigate("/login");
   };
 
-  const date = new Date();
-  const fullYear = date.getFullYear();
-const sidebarItems = useMemo(
-  () => [
-    {
-      key: "/dashboard",
-      label: "My Dashboard",
-      icon: <FaHome size={18} />, // 🏠 Home / overview
-      link: "/dashboard",
-    },
+  // ✅ GET /api/users/me
+  const fetchMe = async () => {
+    setMeLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/users/me`, {
+        headers: { ...getAuthHeaders() },
+      });
+      if (!res.ok) throw new Error("Failed to load profile");
+      const data = await res.json();
+      setMe(data || null);
 
-    {
-      key: "/events",
-      label: "All Events",
-      icon: <FaCalendarAlt size={18} />, // 📅 All events
-      link: "/events",
-    },
+      if (data?.name) localStorage.setItem("name", data.name);
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      const fallbackName = localStorage.getItem("name");
+      setMe(fallbackName ? { name: fallbackName } : null);
+    } finally {
+      setMeLoading(false);
+    }
+  };
 
-    {
-      key: "/upcoming-events",
-      label: "Upcoming Events",
-      icon: <FaClock size={18} />, // ⏰ Upcoming / future
-      link: "/upcoming-events",
-    },
+  useEffect(() => {
+    fetchMe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    {
-      key: "/gallery-view",
-      label: "Village Gallery",
-      icon: <FaImages size={18} />, // 🖼️ Gallery
-      link: "/gallery-view",
-    },
+  // ✅ open edit modal
+  const openEdit = () => {
+    const current = me || {};
+    form.setFieldsValue({
+      name: safeStr(current.name),
+      address: safeStr(current.address),
+      village: safeStr(current.village),
+    });
+    setEditOpen(true);
+  };
 
-    {
-      key: "/payments",
-      label: "My Payments",
-      icon: <FaCreditCard size={18} />, // 💳 Payments (correct icon)
-      link: "/payments",
-    },
+  // ✅ PUT /api/users/me
+  const saveProfile = async () => {
+    try {
+      setSaving(true);
+      const values = await form.validateFields();
 
-    {
-      key: "/blogs",
-      label: "Village Blogs",
-      icon: <FaNewspaper size={18} />, // 📰 Blogs / news
-      link: "/blogs",
-    },
-  ],
-  [],
-);
-  // ✅ Active key highlight (supports nested routes)
+      const payload = {
+        name: safeStr(values.name).trim(),
+        address: safeStr(values.address).trim(),
+        village: safeStr(values.village).trim(),
+      };
+
+      const res = await fetch(`${API_BASE}/api/users/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errTxt = await res.text().catch(() => "");
+        throw new Error(errTxt || "Profile update failed");
+      }
+
+      message.success("Profile updated successfully");
+      setEditOpen(false);
+      await fetchMe();
+    } catch (e) {
+      message.error(e?.message || "Update failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const fullYear = new Date().getFullYear();
+
+  const sidebarItems = useMemo(
+    () => [
+      {
+        key: "/dashboard",
+        label: "My Dashboard",
+        icon: <FaHome size={18} />,
+        link: "/dashboard",
+      },
+      {
+        key: "/events",
+        label: "All Events",
+        icon: <FaCalendarAlt size={18} />,
+        link: "/events",
+      },
+      {
+        key: "/upcoming-events",
+        label: "Upcoming Events",
+        icon: <FaClock size={18} />,
+        link: "/upcoming-events",
+      },
+      {
+        key: "/gallery-view",
+        label: "Village Gallery",
+        icon: <FaImages size={18} />,
+        link: "/gallery-view",
+      },
+      {
+        key: "/payments",
+        label: "My Payments",
+        icon: <FaCreditCard size={18} />,
+        link: "/payments",
+      },
+      {
+        key: "/blogs",
+        label: "Village Blogs",
+        icon: <FaNewspaper size={18} />,
+        link: "/blogs",
+      },
+    ],
+    [],
+  );
+
   const selectedKey = useMemo(() => {
     const path = location.pathname;
     const match = sidebarItems
@@ -110,13 +206,13 @@ const sidebarItems = useMemo(
     return match || "/";
   }, [location.pathname, sidebarItems]);
 
-  // ✅ Breadcrumb map
   const breadcrumbMap = useMemo(
     () => ({
       "/": "Dashboard",
+      "/dashboard": "Dashboard",
       "/events": "Events",
       "/payments": "My Payments",
-      "/gallery": "Gallery",
+      "/gallery-view": "Gallery",
       "/blogs": "Blogs",
       "/upcoming-events": "Upcoming Events",
     }),
@@ -148,12 +244,26 @@ const sidebarItems = useMemo(
     ];
   }, [location.pathname, breadcrumbMap]);
 
-  // widths used in layout calculations
   const siderExpanded = 240;
   const siderCollapsed = 80;
-const adminName = localStorage.getItem("name") || "Admin";
-
   const leftWidth = screens.xs ? 0 : collapsed ? siderCollapsed : siderExpanded;
+
+  const displayName = safeStr(me?.name) || "User";
+  const lrCode = getLrCode(me?.id);
+
+  // ✅ dropdown items
+  const menuItems = [
+    { key: "profile", icon: <ProfileOutlined />, label: "My Profile" },
+    { key: "deals", icon: <GiftOutlined />, label: "My Events" },
+    { type: "divider" },
+    { key: "logout", icon: <LogoutOutlined />, label: "Logout", danger: true },
+  ];
+
+  const onMenuClick = ({ key }) => {
+    if (key === "profile") openEdit();
+    if (key === "deals") navigate("/events"); // ✅ change if your route is different
+    if (key === "logout") handleSignOut();
+  };
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#ffffff" }}>
@@ -176,7 +286,7 @@ const adminName = localStorage.getItem("name") || "Admin";
           boxShadow: "2px 0 6px rgba(0,0,0,0.1)",
         }}
       >
-        {/* ✅ TOP (Fixed) : Logo */}
+        {/* ✅ TOP : Logo */}
         <div style={{ padding: "14px 0" }}>
           <Row justify="center" align="middle">
             <Link
@@ -189,7 +299,6 @@ const adminName = localStorage.getItem("name") || "Admin";
               }}
             >
               <SirivaramLogo size={collapsed ? 42 : 46} />
-
               {!collapsed && (
                 <div style={{ lineHeight: 1.1 }}>
                   <div
@@ -203,7 +312,7 @@ const adminName = localStorage.getItem("name") || "Admin";
           </Row>
         </div>
 
-        {/* ✅ MIDDLE (Scrollable) : Menu */}
+        {/* ✅ MENU */}
         <div style={{ flex: 1, overflowY: "auto", paddingBottom: 10 }}>
           <Menu
             mode="inline"
@@ -212,10 +321,7 @@ const adminName = localStorage.getItem("name") || "Admin";
             onOpenChange={(keys) =>
               setOpenKeys(keys.length ? [keys.pop()] : [])
             }
-            style={{
-              borderRight: "none",
-              background: "transparent",
-            }}
+            style={{ borderRight: "none", background: "transparent" }}
           >
             {sidebarItems.map((item) => (
               <Menu.Item
@@ -253,7 +359,7 @@ const adminName = localStorage.getItem("name") || "Admin";
         <Header
           style={{
             padding: screens.xs ? "0 12px" : "0 18px",
-            background: "#ffffff", // ✅ Full white
+            background: "#ffffff",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -266,6 +372,7 @@ const adminName = localStorage.getItem("name") || "Admin";
             height: 72,
           }}
         >
+          {/* LEFT: Collapse */}
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <button
               onClick={toggleCollapse}
@@ -281,30 +388,131 @@ const adminName = localStorage.getItem("name") || "Admin";
             </button>
           </div>
 
+          {/* RIGHT: Logout + Profile (Responsive) */}
           <div
-            onClick={handleSignOut}
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 12, // ✅ proper spacing
-              cursor: "pointer",
+              gap: screens.xs ? 8 : 12,
+              flexWrap: "nowrap",
             }}
           >
-            {/* ✅ Admin Name */}
-            <div style={{ lineHeight: 1.1, textAlign: "right" }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: "#111827" }}>
-                {adminName}
-              </div>
+            {/* ✅ Logout Button (FIRST) */}
+            <div
+              onClick={handleSignOut}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                cursor: "pointer",
+                padding: screens.xs ? "6px 8px" : "6px 10px",
+             
+               
+              }}
+            >
+              <MdLogout style={{ color: "#6B7280", fontSize: 16 }} />
+              {!screens.xs && (
+                <span
+                  style={{ color: "#6B7280", fontSize: 14, fontWeight: 700 }}
+                >
+                  Logout
+                </span>
+              )}
             </div>
 
-            {/* ✅ Divider (optional but looks premium) */}
-            <div style={{ width: 1, height: 22, background: "#E5E7EB" }} />
+            {/* ✅ Divider (hide on mobile) */}
+            {!screens.xs && (
+              <div style={{ width: 1, height: 22, background: "#E5E7EB" }} />
+            )}
 
-            {/* ✅ Logout */}
-            <MdLogout style={{ color: "#6B7280", fontSize: 16 }} />
-            <span style={{ color: "#6B7280", fontSize: 14, fontWeight: 700 }}>
-              Logout
-            </span>
+            {/* ✅ Profile Dropdown (SECOND) */}
+            <Dropdown
+              trigger={["click"]}
+              placement="bottomRight"
+              menu={{ items: menuItems, onClick: onMenuClick }}
+              dropdownRender={(menu) => (
+                <div
+                  style={{
+                    width: 260,
+                    background: "#fff",
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+                  }}
+                >
+                  {/* Top profile card */}
+                  <div style={{ padding: 14, background: "#f9fafb" }}>
+                    <Space align="start">
+                      <Avatar size={44} icon={<UserOutlined />} />
+                      <div style={{ lineHeight: 1.2 }}>
+                        <div style={{ fontWeight: 900, color: "#111827" }}>
+                          {meLoading ? "Loading..." : displayName}
+                        </div>
+                        <div
+                          style={{
+                            color: "#6b7280",
+                            fontWeight: 800,
+                            fontSize: 13,
+                          }}
+                        >
+                          {lrCode}
+                        </div>
+                        <div
+                          style={{
+                            color: "#6b7280",
+                            fontWeight: 600,
+                            fontSize: 13,
+                          }}
+                        >
+                          {safeStr(me?.role) || "User"}
+                        </div>
+                      </div>
+                    </Space>
+                  </div>
+
+                  <Divider style={{ margin: 0 }} />
+                  {menu}
+                </div>
+              )}
+            >
+              <div
+                style={{
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: screens.xs ? "6px 8px" : "6px 10px",
+              
+                  maxWidth: screens.xs ? 160 : "unset",
+                }}
+              >
+                <Avatar size={34} icon={<UserOutlined />} />
+
+                {/* Hide text on small screens */}
+                {!screens.xs && (
+                  <div style={{ lineHeight: 1.1 }}>
+                    <div
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 900,
+                        color: "#111827",
+                      }}
+                    >
+                      {meLoading ? "Loading..." : displayName}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 800,
+                        color: "#6b7280",
+                      }}
+                    >
+                      {lrCode}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Dropdown>
           </div>
         </Header>
 
@@ -314,11 +522,10 @@ const adminName = localStorage.getItem("name") || "Admin";
             marginTop: 84,
             marginLeft: screens.xs ? 0 : leftWidth,
             padding: screens.xs ? 12 : 22,
-            background: "#ffffff", // ✅ White
+            background: "#ffffff",
             minHeight: "calc(100vh - 84px)",
           }}
         >
-          {/* ✅ Breadcrumb */}
           <div
             style={{
               marginBottom: 14,
@@ -330,15 +537,6 @@ const adminName = localStorage.getItem("name") || "Admin";
           >
             <Breadcrumb items={breadcrumbItems} />
           </div>
-
-          {/* <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 18, fontWeight: 900, color: "#111827" }}>
-              Welcome to Sirivaram Village
-            </div>
-            <div style={{ fontSize: 13, color: "#6B7280", fontWeight: 600 }}>
-              Hello, {displayName} 👋
-            </div>
-          </div> */}
 
           {children}
         </Content>
@@ -355,91 +553,121 @@ const adminName = localStorage.getItem("name") || "Admin";
         </Footer>
       </Layout>
 
-      {/* ✅ Same scrollbar + hover CSS (kept dark sider) */}
-      {/* <style>{`
+      {/* ✅ EDIT PROFILE MODAL (Responsive) */}
+      <Modal
+        open={editOpen}
+        onCancel={() => (!saving ? setEditOpen(false) : null)}
+        onOk={saveProfile}
+        okText="Save"
+        confirmLoading={saving}
+        width={screens.xs ? "100%" : 720}
+        style={screens.xs ? { top: 0, paddingBottom: 0 } : undefined}
+        bodyStyle={{ padding: screens.xs ? 14 : 18 }}
+        destroyOnClose
+        okButtonProps={{
+          style: {
+            backgroundColor: "#008cba",
+            borderColor: "#008cba",
+            color: "#ffffff",
+            fontWeight: 700,
+            borderRadius: 8,
+          },
+        }}
+        cancelButtonProps={{
+          style: {
+            borderRadius: 8,
+            fontWeight: 600,
+          },
+        }}
+      >
+        <Form form={form} layout="vertical" requiredMark="optional">
+          <Row gutter={[12, 12]}>
+            <Col xs={24} md={12}>
+              <Form.Item
+                label="Name"
+                name="name"
+                rules={[
+                  { required: true, message: "Name is required" },
+                  { max: 80, message: "Max 80 characters" },
+                ]}
+              >
+                <Input placeholder="Enter name" allowClear />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={12}>
+              <Form.Item
+                label="Village"
+                name="village"
+                rules={[
+                  { required: true, message: "Village is required" },
+                  { max: 80, message: "Max 80 characters" },
+                ]}
+              >
+                <Input placeholder="Enter village" allowClear />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24}>
+              <Form.Item
+                label="Address"
+                name="address"
+                rules={[
+                  { required: true, message: "Address is required" },
+                  { max: 500, message: "Max 500 characters" },
+                ]}
+              >
+                <Input.TextArea
+                  rows={screens.xs ? 3 : 2}
+                  placeholder="Enter address"
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+
+      {/* ✅ CSS */}
+      <style>{`
+        .ant-layout-sider-zero-width-trigger { display:none !important; }
+
         .ant-layout-sider::-webkit-scrollbar,
         .ant-menu::-webkit-scrollbar { width: 5px; }
         .ant-layout-sider::-webkit-scrollbar-track,
-        .ant-menu::-webkit-scrollbar-track { background: #1a202c; }
+        .ant-menu::-webkit-scrollbar-track { background: #ffffff; }
         .ant-layout-sider::-webkit-scrollbar-thumb,
         .ant-menu::-webkit-scrollbar-thumb {
-          background-color: #4a5568;
-          border-radius: 10px;
+          background-color: #d1d5db; border-radius: 10px;
+        }
+
+        .ant-layout-sider,
+        .ant-layout-sider .ant-menu { background: #ffffff !important; }
+
+        .ant-menu-item, .ant-menu-submenu-title {
+          color: #111827 !important; font-weight: 600;
+        }
+
+        .ant-menu-item:hover, .ant-menu-submenu-title:hover {
+          background-color: #f3f4f6 !important; color: #111827 !important;
         }
 
         .ant-menu-item-selected {
-          background-color: #2d3748 !important;
+          background-color: #e5e7eb !important;
+          color: #111827 !important;
+          font-weight: 700;
         }
-        .ant-menu-item:hover {
-          background-color: #2d3748 !important;
+
+        .ant-menu-item a { color:#111827 !important; }
+        .ant-menu-item:hover a,
+        .ant-menu-item-selected a { color:#111827 !important; }
+
+        /* ✅ modal full screen on mobile */
+        @media (max-width: 576px) {
+          .ant-modal { max-width: 100vw !important; margin: 0 !important; }
+          .ant-modal-content { border-radius: 0 !important; min-height: 100vh; }
         }
-      `}</style> */}
-      <style>{`
-  /* Scrollbar */
-  .ant-layout-sider::-webkit-scrollbar,
-  .ant-menu::-webkit-scrollbar {
-    width: 5px;
-  }
-    /* ============================= */
-/* FIX: Mobile sidebar hamburger */
-/* ============================= */
-
-/* ✅ Permanently remove the mobile zero-width trigger (hamburger) */
-.ant-layout-sider-zero-width-trigger {
-  display: none !important;
-}
-
-
-
-
-  .ant-layout-sider::-webkit-scrollbar-track,
-  .ant-menu::-webkit-scrollbar-track {
-    background: #ffffff; /* ✅ white */
-  }
-
-  .ant-layout-sider::-webkit-scrollbar-thumb,
-  .ant-menu::-webkit-scrollbar-thumb {
-    background-color: #d1d5db; /* light gray */
-    border-radius: 10px;
-  }
-
-  /* Sidebar & menu background */
-  .ant-layout-sider,
-  .ant-layout-sider .ant-menu {
-    background: #ffffff !important;
-  }
-
-  /* Menu item text */
-  .ant-menu-item,
-  .ant-menu-submenu-title {
-    color: #111827 !important; /* dark text */
-    font-weight: 600;
-  }
-
-  /* Hover state */
-  .ant-menu-item:hover,
-  .ant-menu-submenu-title:hover {
-    background-color: #f3f4f6 !important; /* light gray hover */
-    color: #111827 !important;
-  }
-
-  /* Selected item */
-  .ant-menu-item-selected {
-    background-color: #e5e7eb !important; /* selected gray */
-    color: #111827 !important;
-    font-weight: 700;
-  }
-
-  /* Links inside menu */
-  .ant-menu-item a {
-    color: #111827 !important;
-  }
-
-  .ant-menu-item:hover a,
-  .ant-menu-item-selected a {
-    color: #111827 !important;
-  }
-`}</style>
+      `}</style>
     </Layout>
   );
 }

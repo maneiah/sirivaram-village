@@ -55,6 +55,14 @@ export default function GetInTouchSimple() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const safeJson = async (res) => {
+    try {
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setResponseData(null);
@@ -64,25 +72,50 @@ export default function GetInTouchSimple() {
     setIsSubmitting(true);
 
     try {
-      // ✅ Mock API response (replace with real API later)
-      await new Promise((r) => setTimeout(r, 700));
+      const response = await fetch(
+        "https://sirivaram-backed.onrender.com/api/contact",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formData.name.trim(),
+            email: formData.email.trim(),
+            subject: formData.subject.trim(),
+            message: formData.message.trim(),
+          }),
+        },
+      );
 
-      const apiResponse = {
-        status: true,
-        message: "Message sent successfully! We will contact you soon.",
-        id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        data: formData,
-      };
+      const data = await safeJson(response);
 
-      setResponseData(apiResponse);
-      setFormData(initialForm);
-      setErrors({});
+      if (response.ok) {
+        setResponseData({
+          status: true,
+          message:
+            data?.message ||
+            "Message sent successfully! We will contact you soon.",
+          id: data?.id ,
+        });
+
+        setFormData(initialForm);
+        setErrors({});
+      } else {
+        const errorMessage =
+          data?.message ||
+          data?.error ||
+          "Something went wrong. Please try again.";
+
+        setResponseData({
+          status: false,
+          message: errorMessage,
+        });
+      }
     } catch (err) {
       setResponseData({
         status: false,
-        message: "Something went wrong. Please try again.",
+        message: "Something went wrong. Please try again later.",
       });
-      setErrors(err.message || {});
+      console.error("Error submitting contact form:", err);
     } finally {
       setIsSubmitting(false);
     }
@@ -97,8 +130,6 @@ export default function GetInTouchSimple() {
       <div className="max-w-7xl mx-auto">
         {/* Heading */}
         <div className="text-center max-w-2xl mx-auto mb-10">
-         
-
           <h2 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-extrabold text-amber-900">
             Get in touch with Sirivaram Village
           </h2>
@@ -256,7 +287,6 @@ export default function GetInTouchSimple() {
           </div>
         </div>
 
-        {/* Optional small footer info */}
         <div className="text-center mt-10 text-sm text-gray-600">
           Prefer WhatsApp or Phone? You can add contact details here later.
         </div>

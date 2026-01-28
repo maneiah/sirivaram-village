@@ -22,9 +22,6 @@ import {
   PictureOutlined,
   ReadOutlined,
   ArrowRightOutlined,
-  ThunderboltOutlined,
-  MobileOutlined,
-  SafetyOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import UserLayout from "../layouts/UserLayout";
@@ -33,6 +30,31 @@ import dayjs from "dayjs";
 const { Title, Text } = Typography;
 
 const API_BASE = "https://sirivaram-backed.onrender.com";
+
+const safeJson = async (res) => {
+  try {
+    return await res.json();
+  } catch {
+    return null;
+  }
+};
+
+const safeStr = (v) => (v === null || v === undefined ? "" : String(v));
+
+const formatDateRange = (startDate, endDate) => {
+  if (!startDate) return "—";
+  const s = dayjs(startDate);
+  const e = endDate ? dayjs(endDate) : null;
+  if (!e || e.isSame(s, "day")) return s.format("DD MMM YYYY");
+  return `${s.format("DD MMM YYYY")} - ${e.format("DD MMM YYYY")}`;
+};
+
+const statusColor = (status) => {
+  if (status === "APPROVED") return "green";
+  if (status === "PENDING") return "gold";
+  if (status === "REJECTED") return "red";
+  return "default";
+};
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -51,8 +73,13 @@ export default function UserDashboard() {
   const [latestBlogs, setLatestBlogs] = useState([]);
   const [galleryItems, setGalleryItems] = useState([]);
 
-  // You can replace this with actual user data from your auth context
-  const userName = "Maneiah"; // Personalised from your display name
+  // ✅ user from /api/users/me
+  const [user, setUser] = useState(null);
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
 
   const quickCards = useMemo(
     () => [
@@ -92,42 +119,43 @@ export default function UserDashboard() {
     [counts],
   );
 
-  const safeJson = async (res) => {
-    try {
-      return await res.json();
-    } catch {
-      return null;
-    }
-  };
-
-  const formatDateRange = (startDate, endDate) => {
-    if (!startDate) return "—";
-    const s = dayjs(startDate);
-    const e = endDate ? dayjs(endDate) : null;
-    if (!e || e.isSame(s, "day")) return s.format("DD MMM YYYY");
-    return `${s.format("DD MMM YYYY")} - ${e.format("DD MMM YYYY")}`;
-  };
-
   useEffect(() => {
     let alive = true;
 
     const load = async () => {
       setLoading(true);
+
       try {
-        const [eventsRes, paymentsRes, blogsRes, galleryRes] =
+        // ✅ Call /api/users/me and dashboard APIs together
+        const [meRes, eventsRes, paymentsRes, blogsRes, galleryRes] =
           await Promise.all([
+            fetch(`${API_BASE}/api/users/me`, {
+              headers: { ...getAuthHeaders() },
+            }).catch(() => null),
+
             fetch(`${API_BASE}/api/events/upcoming`).catch(() => null),
-            fetch(`${API_BASE}/api/payments`).catch(() => null),
+            fetch(`${API_BASE}/api/payments`, {
+              headers: { ...getAuthHeaders() },
+            }).catch(() => null),
             fetch(`${API_BASE}/api/blogs`).catch(() => null),
             fetch(`${API_BASE}/api/gallery`).catch(() => null),
           ]);
 
+        const meData = meRes ? await safeJson(meRes) : null;
         const eventsData = eventsRes ? await safeJson(eventsRes) : null;
         const paymentsData = paymentsRes ? await safeJson(paymentsRes) : null;
         const blogsData = blogsRes ? await safeJson(blogsRes) : null;
         const galleryData = galleryRes ? await safeJson(galleryRes) : null;
 
         if (!alive) return;
+
+        // ✅ set user
+        if (meRes?.ok && meData) {
+          setUser(meData);
+        } else {
+          // if token missing/expired, keep fallback user null (no break)
+          setUser(null);
+        }
 
         const eventsList = Array.isArray(eventsData) ? eventsData : [];
         const paymentsList = Array.isArray(paymentsData) ? paymentsData : [];
@@ -158,6 +186,9 @@ export default function UserDashboard() {
     };
   }, []);
 
+  // ✅ name from API (fallback)
+  const name = localStorage.getItem("name") || (user ? user.name : "User");
+console.log("Rendering UserDashboard for", name);
   return (
     <UserLayout>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -171,12 +202,29 @@ export default function UserDashboard() {
             <Col xs={24} md={14}>
               <Space direction="vertical" size={12}>
                 <Title level={3} style={{ margin: 0 }}>
-                  Welcome back, {userName}!
+                  Welcome back, {name}!
                 </Title>
+
                 <Text type="secondary">
                   Here's a quick overview of your community activities
                 </Text>
-               
+
+                {/* ✅ optional user info row */}
+                {user ? (
+                  <Space wrap size={8}>
+                    {user?.mobile ? (
+                      <Tag color="blue">📱 {safeStr(user.mobile)}</Tag>
+                    ) : null}
+                    {user?.village ? (
+                      <Tag color="geekblue">🏡 {safeStr(user.village)}</Tag>
+                    ) : null}
+                    {user?.status ? (
+                      <Tag color={statusColor(user.status)}>
+                        {safeStr(user.status)}
+                      </Tag>
+                    ) : null}
+                  </Space>
+                ) : null}
               </Space>
             </Col>
 

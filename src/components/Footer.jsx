@@ -4,12 +4,83 @@ import { FaWhatsappSquare } from "react-icons/fa";
 import { IoLogoYoutube } from "react-icons/io";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+const FOOTER_API = "https://sirivaram-backed.onrender.com/api/footer";
+
+const safeStr = (v) => (typeof v === "string" ? v : "");
+const cleanUrl = (url, fallback = "") => {
+  const u = safeStr(url).trim();
+  if (!u) return fallback;
+  try {
+    const parsed = new URL(u);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") return u;
+    return fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const location = useLocation();
   const navigate = useNavigate();
 
   const [showTop, setShowTop] = useState(false);
+
+  // ✅ API footer state
+  const [footer, setFooter] = useState({
+    id: "",
+    address:
+      "Sirivaram Village, Penagaluru Mandal, Annamayya District, Andhra Pradesh",
+    contactNo: "+91 70934 85208",
+    email: "sirivaram@gmail.com",
+    facebook: "https://facebook.com",
+    instagram: "https://instagram.com",
+    youtube: "https://youtube.com",
+  });
+  const [loading, setLoading] = useState(false);
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  // ✅ fetch footer from backend
+  useEffect(() => {
+    let alive = true;
+
+    const fetchFooter = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(FOOTER_API, {
+          headers: { ...getAuthHeaders() },
+        });
+        if (!res.ok) throw new Error(`Footer API failed: ${res.status}`);
+        const data = await res.json();
+
+        if (!alive) return;
+
+        setFooter((prev) => ({
+          ...prev,
+          id: safeStr(data?.id),
+          address: safeStr(data?.address) || prev.address,
+          contactNo: safeStr(data?.contactNo) || prev.contactNo,
+          email: safeStr(data?.email) || prev.email,
+          facebook: cleanUrl(data?.facebook, prev.facebook),
+          instagram: cleanUrl(data?.instagram, prev.instagram),
+          youtube: cleanUrl(data?.youtube, prev.youtube),
+        }));
+      } catch {
+        // keep defaults if api fails (no UI break)
+      } finally {
+        if (alive) setLoading(false);
+      }
+    };
+
+    fetchFooter();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   // ✅ show back-to-top only after scroll
   useEffect(() => {
@@ -23,7 +94,6 @@ export default function Footer() {
   const smoothScroll = (e, sectionId) => {
     e.preventDefault();
 
-    // If not on home, navigate first
     if (location.pathname !== "/") {
       navigate("/" + sectionId);
 
@@ -40,7 +110,6 @@ export default function Footer() {
       return;
     }
 
-    // already on home
     const el = document.querySelector(sectionId);
     if (el) {
       const yOffset = -90;
@@ -55,7 +124,7 @@ export default function Footer() {
     window.history.replaceState(null, "", location.pathname);
   };
 
-  // ✅ JSON-LD schema (memo so it doesn't recreate each render)
+  // ✅ schema uses API data
   const orgSchema = useMemo(
     () => ({
       "@context": "https://schema.org",
@@ -63,28 +132,31 @@ export default function Footer() {
       name: "Sirivaram Village",
       url: "https://sirivaram-village.vercel.app",
       logo: "https://sirivaram-village.vercel.app/favicon.png",
-      sameAs: [
-        "https://facebook.com",
-        "https://instagram.com",
-        "https://wa.me/917093485208",
-        "https://youtube.com",
-      ],
+      sameAs: [footer.facebook, footer.instagram, footer.youtube].filter(
+        Boolean,
+      ),
       contactPoint: {
         "@type": "ContactPoint",
-        email: "sirivaram@gmail.com",
-        telephone: "+91 70934 85208",
+        email: footer.email,
+        telephone: footer.contactNo,
         contactType: "customer support",
       },
       address: {
         "@type": "PostalAddress",
-        streetAddress: "Sirivaram Village, Penagaluru Mandal",
-        addressLocality: "Sirivaram",
-        addressRegion: "Annamayya District",
+        streetAddress: footer.address,
         addressCountry: "IN",
       },
     }),
-    [],
+    [footer],
   );
+
+  // WhatsApp link (you can also add whatsapp in API later; for now using contactNo)
+  const whatsappLink = useMemo(() => {
+    const digits = safeStr(footer.contactNo).replace(/[^\d]/g, "");
+    // If number already contains country code, keep it; else assume India (+91)
+    const formatted = digits.length >= 10 ? digits : "917093485208";
+    return `https://wa.me/${formatted}`;
+  }, [footer.contactNo]);
 
   return (
     <footer className="relative bg-amber-950 text-white">
@@ -178,6 +250,12 @@ export default function Footer() {
               Preserving heritage, celebrating culture, and welcoming devotees
               and visitors to our village temple.
             </p>
+
+            {loading ? (
+              <p className="text-xs text-amber-100/70 mt-3">
+                Updating footer info…
+              </p>
+            ) : null}
           </div>
 
           {/* Quick Links */}
@@ -234,7 +312,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Contact (API driven) */}
           <div>
             <h3 className="text-sm uppercase tracking-wider text-amber-100/90 font-semibold mb-4">
               Contact
@@ -243,32 +321,29 @@ export default function Footer() {
             <address className="not-italic text-amber-100/85 text-sm leading-relaxed space-y-2">
               <div>
                 <span className="font-semibold text-amber-100">Email:</span>{" "}
-                <a
-                  href="mailto:sirivaram@gmail.com"
-                  className="hover:underline"
-                >
-                  sirivaram@gmail.com
+                <a href={`mailto:${footer.email}`} className="hover:underline">
+                  {footer.email}
                 </a>
               </div>
 
               <div>
                 <span className="font-semibold text-amber-100">Phone:</span>{" "}
-                <a href="tel:+917093485208" className="hover:underline">
-                  +91 70934 85208
+                <a
+                  href={`tel:${footer.contactNo.replace(/\s+/g, "")}`}
+                  className="hover:underline"
+                >
+                  {footer.contactNo}
                 </a>
               </div>
 
               <div>
                 <span className="font-semibold text-amber-100">Address:</span>
-                <div className="mt-1">
-                  Sirivaram Village, Penagaluru Mandal, <br />
-                  Annamayya District, Andhra Pradesh
-                </div>
+                <div className="mt-1 whitespace-pre-line">{footer.address}</div>
               </div>
             </address>
           </div>
 
-          {/* Social */}
+          {/* Social (API driven) */}
           <div>
             <h3 className="text-sm uppercase tracking-wider text-amber-100/90 font-semibold mb-4">
               Follow Us
@@ -279,7 +354,7 @@ export default function Footer() {
 
             <div className="flex gap-3">
               <a
-                href="https://facebook.com"
+                href={footer.facebook || "https://facebook.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center hover:bg-white/15 transition transform hover:scale-105"
@@ -289,7 +364,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://instagram.com"
+                href={footer.instagram || "https://instagram.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center transition transform hover:scale-105"
@@ -303,7 +378,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://wa.me/917093485208"
+                href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center hover:bg-white/15 transition transform hover:scale-105"
@@ -313,7 +388,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://youtube.com"
+                href={footer.youtube || "https://youtube.com"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center hover:bg-white/15 transition transform hover:scale-105"
