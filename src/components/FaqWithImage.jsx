@@ -138,12 +138,9 @@ export default function FaqWithImage() {
                   <Accordion.Control>
                     Where is Sirivaram located?
                   </Accordion.Control>
-                  <Accordion.Panel>
-                    Sirivaram village is located in <b>Penagalur Mandal</b>,{" "}
-                    <b>Kadapa District</b>, Andhra Pradesh. It falls under{" "}
-                    <b>Kodur Panchayathi</b> and is near the town of{" "}
-                    <b>Rajampet</b>.
-                  </Accordion.Panel>
+                 <Accordion.Panel>
+  Sirivaram village is located in <b>Penagalur Mandal</b>, <b>Tirupati District</b> (formerly part of YSR Kadapa District), Andhra Pradesh. It falls under <b>Kondur Gram Panchayat</b> and the <b>Kodur (Railway Kodur) Assembly Constituency</b>, near the town of <b>Rajampet</b>.
+</Accordion.Panel>
                 </Accordion.Item>
 
                 <Accordion.Item value="pincode">
@@ -151,7 +148,7 @@ export default function FaqWithImage() {
                     What is the pincode of Sirivaram?
                   </Accordion.Control>
                   <Accordion.Panel>
-                    The pincode for Sirivaram village is <b>516271</b>.
+                    The pincode for Sirivaram village is <b>516127</b>.
                   </Accordion.Panel>
                 </Accordion.Item>
 
@@ -160,8 +157,8 @@ export default function FaqWithImage() {
                     What is the population of Sirivaram?
                   </Accordion.Control>
                   <Accordion.Panel>
-                    As per the 2011 Census, Sirivaram has a population of{" "}
-                    <b>720</b> people.
+                    As per the 2026 Census, Sirivaram has a population of{" "}
+                    <b>1000+</b> people.
                   </Accordion.Panel>
                 </Accordion.Item>
 
@@ -170,8 +167,8 @@ export default function FaqWithImage() {
                     What is the literacy rate in Sirivaram?
                   </Accordion.Control>
                   <Accordion.Panel>
-                    The overall literacy rate in Sirivaram is <b>41.39%</b>{" "}
-                    according to 2011 Census data.
+                    The overall literacy rate in Sirivaram is <b>71.39%</b>{" "}
+                    according to 2026 Census data.
                   </Accordion.Panel>
                 </Accordion.Item>
 
@@ -180,10 +177,8 @@ export default function FaqWithImage() {
                     What temples are there in Sirivaram?
                   </Accordion.Control>
                   <Accordion.Panel>
-                    Sirivaram is famous for its <b>ancient Lord Shiva Temple</b>{" "}
-                    and other small local temples. These temples host festivals
-                    like <b>Shivaratri</b> and <b>Deepavali</b>.
-                  </Accordion.Panel>
+  Sirivaram is renowned for its ancient <b>Ramalayam</b> (Sri Rama Temple) and <b>Sri Anjaneya Swamy</b> Temple, along with shrines dedicated to Goddesses Gangamma Talli, Maramma, Yellamma, Ankalamma, Lord Shiva, Sri Krishna, and several other small local temples. These sacred sites come alive during various vibrant festivals such as [e.g., Sri Rama Navami, Hanuman Jayanti, Gangamma Jatara, village car festivals, etc.].
+</Accordion.Panel>
                 </Accordion.Item>
               </Accordion>
             </Stack>

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Facebook, Instagram, ArrowUp } from "lucide-react";
+import { Facebook, Instagram, ArrowUp, Twitter } from "lucide-react"; // Added Twitter icon
 import { FaWhatsappSquare } from "react-icons/fa";
 import { IoLogoYoutube } from "react-icons/io";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -26,7 +26,7 @@ export default function Footer() {
 
   const [showTop, setShowTop] = useState(false);
 
-  // ✅ API footer state
+  // ✅ API footer state (added twitter)
   const [footer, setFooter] = useState({
     id: "",
     address:
@@ -36,6 +36,7 @@ export default function Footer() {
     facebook: "https://facebook.com",
     instagram: "https://instagram.com",
     youtube: "https://youtube.com",
+    twitter: "", // New field (X/Twitter) – update backend to provide real URL
   });
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +45,7 @@ export default function Footer() {
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
-  // ✅ fetch footer from backend
+  // ✅ fetch footer from backend (added twitter parsing)
   useEffect(() => {
     let alive = true;
 
@@ -68,6 +69,7 @@ export default function Footer() {
           facebook: cleanUrl(data?.facebook, prev.facebook),
           instagram: cleanUrl(data?.instagram, prev.instagram),
           youtube: cleanUrl(data?.youtube, prev.youtube),
+          twitter: cleanUrl(data?.twitter || data?.x, ""), // Support twitter or x field name
         }));
       } catch {
         // keep defaults if api fails (no UI break)
@@ -124,7 +126,7 @@ export default function Footer() {
     window.history.replaceState(null, "", location.pathname);
   };
 
-  // ✅ schema uses API data
+  // ✅ schema uses API data (added twitter to sameAs)
   const orgSchema = useMemo(
     () => ({
       "@context": "https://schema.org",
@@ -132,9 +134,12 @@ export default function Footer() {
       name: "Sirivaram Village",
       url: "https://sirivaram-village.vercel.app",
       logo: "https://sirivaram-village.vercel.app/favicon.png",
-      sameAs: [footer.facebook, footer.instagram, footer.youtube].filter(
-        Boolean,
-      ),
+      sameAs: [
+        footer.facebook,
+        footer.instagram,
+        footer.youtube,
+        footer.twitter,
+      ].filter(Boolean),
       contactPoint: {
         "@type": "ContactPoint",
         email: footer.email,
@@ -150,10 +155,9 @@ export default function Footer() {
     [footer],
   );
 
-  // WhatsApp link (you can also add whatsapp in API later; for now using contactNo)
+  // WhatsApp link (unchanged)
   const whatsappLink = useMemo(() => {
     const digits = safeStr(footer.contactNo).replace(/[^\d]/g, "");
-    // If number already contains country code, keep it; else assume India (+91)
     const formatted = digits.length >= 10 ? digits : "917093485208";
     return `https://wa.me/${formatted}`;
   }, [footer.contactNo]);
@@ -170,7 +174,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center shadow-sm border border-white/10">
-                {/* Village SVG Icon */}
+                {/* Village SVG Icon (unchanged) */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 350 350"
@@ -258,7 +262,7 @@ export default function Footer() {
             ) : null}
           </div>
 
-          {/* Quick Links */}
+          {/* Quick Links (unchanged) */}
           <div>
             <h3 className="text-sm uppercase tracking-wider text-amber-100/90 font-semibold mb-4">
               Quick Links
@@ -312,7 +316,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact (API driven) */}
+          {/* Contact (API driven) – unchanged */}
           <div>
             <h3 className="text-sm uppercase tracking-wider text-amber-100/90 font-semibold mb-4">
               Contact
@@ -343,7 +347,7 @@ export default function Footer() {
             </address>
           </div>
 
-          {/* Social (API driven) */}
+          {/* Social (API driven) – added Twitter/X */}
           <div>
             <h3 className="text-sm uppercase tracking-wider text-amber-100/90 font-semibold mb-4">
               Follow Us
@@ -352,7 +356,7 @@ export default function Footer() {
               Stay connected with updates, events and stories from Sirivaram.
             </p>
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               <a
                 href={footer.facebook || "https://facebook.com"}
                 target="_blank"
@@ -396,6 +400,19 @@ export default function Footer() {
               >
                 <IoLogoYoutube className="w-5 h-5 text-white" />
               </a>
+
+              {/* New Twitter/X button – only show if URL exists */}
+              {footer.twitter && (
+                <a
+                  href={footer.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center hover:bg-white/15 transition transform hover:scale-105"
+                  aria-label="X (Twitter)"
+                >
+                  <Twitter className="w-5 h-5 text-white" />
+                </a>
+              )}
             </div>
           </div>
         </div>
