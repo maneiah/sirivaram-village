@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   EyeOutlined,
@@ -20,6 +20,17 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const userId = sessionStorage.getItem("userId") || localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+    
+    if (userId && token) {
+      // User is already logged in, redirect to dashboard
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
 
   // Mobile input: only digits, max 10
   const handleMobileChange = (e) => {
@@ -76,6 +87,9 @@ export default function LoginPage() {
       localStorage.setItem("role", data.role || "");
       localStorage.setItem("mobile", data.mobile || "");
       localStorage.setItem("status", data.status || "");
+
+      // Save userId to sessionStorage for quick access
+      sessionStorage.setItem("userId", data.userId || "");
 
       setSuccess("Login successful! Redirecting...");
       setMobile("");

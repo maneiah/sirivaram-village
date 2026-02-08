@@ -14,7 +14,8 @@ import {
   Empty,
   Divider,
   message,
-  Image,
+  Progress,
+  Statistic,
 } from "antd";
 import {
   CalendarOutlined,
@@ -22,6 +23,9 @@ import {
   PictureOutlined,
   ReadOutlined,
   ArrowRightOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  RiseOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import UserLayout from "../layouts/UserLayout";
@@ -49,12 +53,7 @@ const formatDateRange = (startDate, endDate) => {
   return `${s.format("DD MMM YYYY")} - ${e.format("DD MMM YYYY")}`;
 };
 
-const statusColor = (status) => {
-  if (status === "APPROVED") return "green";
-  if (status === "PENDING") return "gold";
-  if (status === "REJECTED") return "red";
-  return "default";
-};
+
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -71,9 +70,7 @@ export default function UserDashboard() {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [recentPayments, setRecentPayments] = useState([]);
   const [latestBlogs, setLatestBlogs] = useState([]);
-  const [galleryItems, setGalleryItems] = useState([]);
 
-  // ✅ user from /api/users/me
   const [user, setUser] = useState(null);
 
   const getAuthHeaders = () => {
@@ -85,34 +82,34 @@ export default function UserDashboard() {
     () => [
       {
         title: "Events",
-        desc: "Check upcoming events",
-        icon: <CalendarOutlined style={{ fontSize: 20 }} />,
+        desc: "Upcoming events",
+        icon: <CalendarOutlined style={{ fontSize: 24 }} />,
         path: "/events",
-        color: "#008cba",
+        color: "#1890ff",
         count: counts.upcomingEvents,
       },
       {
-        title: "My Payments",
-        desc: "Track payment status",
-        icon: <WalletOutlined style={{ fontSize: 20 }} />,
+        title: "Payments",
+        desc: "Payment records",
+        icon: <WalletOutlined style={{ fontSize: 24 }} />,
         path: "/payments",
-        color: "#1ab394",
+        color: "#52c41a",
         count: counts.payments,
       },
       {
         title: "Gallery",
-        desc: "View photos & memories",
-        icon: <PictureOutlined style={{ fontSize: 20 }} />,
+        desc: "Photo memories",
+        icon: <PictureOutlined style={{ fontSize: 24 }} />,
         path: "/gallery",
-        color: "#f59e0b",
+        color: "#faad14",
         count: counts.gallery,
       },
       {
         title: "Blogs",
-        desc: "Read latest blogs",
-        icon: <ReadOutlined style={{ fontSize: 20 }} />,
+        desc: "Latest articles",
+        icon: <ReadOutlined style={{ fontSize: 24 }} />,
         path: "/blogs",
-        color: "#a855f7",
+        color: "#722ed1",
         count: counts.blogs,
       },
     ],
@@ -126,7 +123,6 @@ export default function UserDashboard() {
       setLoading(true);
 
       try {
-        // ✅ Call /api/users/me and dashboard APIs together
         const [meRes, eventsRes, paymentsRes, blogsRes, galleryRes] =
           await Promise.all([
             fetch(`${API_BASE}/api/users/me`, {
@@ -134,7 +130,7 @@ export default function UserDashboard() {
             }).catch(() => null),
 
             fetch(`${API_BASE}/api/events/upcoming`).catch(() => null),
-            fetch(`${API_BASE}/api/payments`, {
+            fetch(`${API_BASE}/api/payments/my`, {
               headers: { ...getAuthHeaders() },
             }).catch(() => null),
             fetch(`${API_BASE}/api/blogs`).catch(() => null),
@@ -149,11 +145,9 @@ export default function UserDashboard() {
 
         if (!alive) return;
 
-        // ✅ set user
         if (meRes?.ok && meData) {
           setUser(meData);
         } else {
-          // if token missing/expired, keep fallback user null (no break)
           setUser(null);
         }
 
@@ -162,10 +156,9 @@ export default function UserDashboard() {
         const blogsList = Array.isArray(blogsData) ? blogsData : [];
         const galleryList = Array.isArray(galleryData) ? galleryData : [];
 
-        setUpcomingEvents(eventsList.slice(0, 4));
-        setRecentPayments(paymentsList.slice(0, 4));
-        setLatestBlogs(blogsList.slice(0, 4));
-        setGalleryItems(galleryList.slice(0, 6));
+        setUpcomingEvents(eventsList.slice(0, 5));
+        setRecentPayments(paymentsList.slice(0, 5));
+        setLatestBlogs(blogsList.slice(0, 5));
 
         setCounts({
           upcomingEvents: eventsList.length,
@@ -186,57 +179,51 @@ export default function UserDashboard() {
     };
   }, []);
 
-  // ✅ name from API (fallback)
   const name = localStorage.getItem("name") || (user ? user.name : "User");
-console.log("Rendering UserDashboard for", name);
+
+  // Calculate payment stats
+  const verifiedPayments = recentPayments.filter(
+    (p) => p?.status === "VERIFIED"
+  ).length;
+  const pendingPayments = recentPayments.filter(
+    (p) => p?.status === "PENDING"
+  ).length;
+  const paymentCompletionRate =
+    counts.payments > 0
+      ? Math.round((verifiedPayments / counts.payments) * 100)
+      : 0;
+
   return (
     <UserLayout>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        {/* Hero / Welcome Card */}
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 16px" }}>
+        {/* Hero Welcome Card */}
         <Card
-          bordered
-          style={{ borderRadius: 16, marginBottom: 16 }}
-          bodyStyle={{ padding: 24 }}
+          bordered={false}
+          style={{
+            borderRadius: 20,
+            marginBottom: 24,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+          }}
+          bodyStyle={{ padding: "32px 24px" }}
         >
-          <Row gutter={[16, 16]} align="middle" justify="space-between">
-            <Col xs={24} md={14}>
-              <Space direction="vertical" size={12}>
-                <Title level={3} style={{ margin: 0 }}>
-                  Welcome back, {name}!
+          <Row gutter={[24, 24]} align="middle">
+            <Col xs={24} lg={16}>
+              <Space direction="vertical" size={16}>
+                <Title level={2} style={{ margin: 0 }}>
+                  🎉 Welcome {name}!
                 </Title>
 
-                <Text type="secondary">
-                  Here's a quick overview of your community activities
+                <Text style={{ fontSize: 16 }} type="secondary">
+                  Track your community activities and stay connected
                 </Text>
-
-                {/* ✅ optional user info row */}
-                {user ? (
-                  <Space wrap size={8}>
-                    {user?.mobile ? (
-                      <Tag color="blue">📱 {safeStr(user.mobile)}</Tag>
-                    ) : null}
-                    {user?.village ? (
-                      <Tag color="geekblue">🏡 {safeStr(user.village)}</Tag>
-                    ) : null}
-                    {user?.status ? (
-                      <Tag color={statusColor(user.status)}>
-                        {safeStr(user.status)}
-                      </Tag>
-                    ) : null}
-                  </Space>
-                ) : null}
               </Space>
             </Col>
 
-            <Col xs={24} md={10} style={{ textAlign: "right" }}>
-              <Space wrap size={12}>
+            <Col xs={24} lg={8} style={{ textAlign: "center" }}>
+              <Space wrap size={12} style={{ justifyContent: "center" }}>
                 <Button
-                  type="primary"
+                  style={{ backgroundColor: "#008cba", color: "white" }}
                   size="large"
-                  style={{
-                    backgroundColor: "#008cba",
-                    borderColor: "#008cba",
-                  }}
                   onClick={() => navigate("/events")}
                   icon={<CalendarOutlined />}
                 >
@@ -244,11 +231,7 @@ console.log("Rendering UserDashboard for", name);
                 </Button>
                 <Button
                   size="large"
-                  style={{
-                    backgroundColor: "#1ab394",
-                    borderColor: "#1ab394",
-                    color: "white",
-                  }}
+                  style={{ backgroundColor: "#1ab394", color: "white" }}
                   onClick={() => navigate("/payments")}
                   icon={<WalletOutlined />}
                 >
@@ -259,62 +242,72 @@ console.log("Rendering UserDashboard for", name);
           </Row>
         </Card>
 
-        {/* Quick action cards */}
-        <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        {/* Quick Stats Cards */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           {quickCards.map((c) => (
-            <Col key={c.title} xs={24} sm={12} md={12} lg={6}>
+            <Col key={c.title} xs={12} sm={12} md={6} lg={6}>
               <Card
                 hoverable
-                bordered
+                bordered={false}
                 style={{
                   borderRadius: 16,
                   height: "100%",
+                  background: c.color,
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                  cursor: "pointer",
                 }}
-                bodyStyle={{ padding: 16 }}
+                bodyStyle={{ padding: 20 }}
                 onClick={() => navigate(c.path)}
               >
-                <Space direction="vertical" style={{ width: "100%" }} size={10}>
-                  <Space
-                    align="center"
-                    style={{ justifyContent: "space-between", width: "100%" }}
+                <Space direction="vertical" style={{ width: "100%" }} size={12}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
                   >
-                    <Avatar
-                      shape="square"
+                    <div
                       style={{
-                        background: c.color,
+                        background: "rgba(255,255,255,0.3)",
                         borderRadius: 12,
+                        width: 48,
+                        height: 48,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#fff",
                       }}
-                      icon={c.icon}
-                      size={44}
-                    />
-
-                    <Badge
-                      count={loading ? "…" : c.count}
-                      showZero
-                      overflowCount={999}
-                      style={{ backgroundColor: "#111827" }}
-                    />
-                  </Space>
-
-                  <div>
-                    <Text style={{ fontSize: 16, fontWeight: 800 }}>
-                      {c.title}
-                    </Text>
-                    <div>
-                      <Text type="secondary" style={{ fontSize: 13 }}>
-                        {c.desc}
-                      </Text>
+                    >
+                      {c.icon}
                     </div>
+                    <Title
+                      level={2}
+                      style={{ margin: 0, fontWeight: 700, color: "#fff" }}
+                    >
+                      {loading ? "..." : c.count}
+                    </Title>
                   </div>
 
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Button
-                      type="link"
-                      icon={<ArrowRightOutlined />}
-                      style={{ padding: 0, color: "#008cba" }}
+                  <div>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 600,
+                        display: "block",
+                        color: "#fff",
+                      }}
                     >
-                      Open
-                    </Button>
+                      {c.title}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: "rgba(255,255,255,0.9)",
+                      }}
+                    >
+                      {c.desc}
+                    </Text>
                   </div>
                 </Space>
               </Card>
@@ -322,112 +315,176 @@ console.log("Rendering UserDashboard for", name);
           ))}
         </Row>
 
-        {/* Main content - Two columns */}
-        <Row gutter={[12, 12]}>
+        {/* Analytics Section */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <Col xs={24} sm={12} md={8}>
+            <Card
+              bordered={false}
+              style={{
+                borderRadius: 16,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              }}
+              bodyStyle={{ padding: 24 }}
+            >
+              <Statistic
+                title={
+                  <Text style={{ fontSize: 14, color: "#8c8c8c" }}>
+                    Payment Completion
+                  </Text>
+                }
+                value={paymentCompletionRate}
+                suffix="%"
+                prefix={<RiseOutlined style={{ color: "#52c41a" }} />}
+                valueStyle={{ color: "#52c41a", fontSize: 28, fontWeight: 700 }}
+              />
+              <Progress
+                percent={paymentCompletionRate}
+                strokeColor={{
+                  "0%": "#52c41a",
+                  "100%": "#73d13d",
+                }}
+                showInfo={false}
+                style={{ marginTop: 12 }}
+              />
+            </Card>
+          </Col>
+
+          <Col xs={24} sm={12} md={8}>
+            <Card
+              bordered={false}
+              style={{
+                borderRadius: 16,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              }}
+              bodyStyle={{ padding: 24 }}
+            >
+              <Statistic
+                title={
+                  <Text style={{ fontSize: 14, color: "#8c8c8c" }}>
+                    Verified Payments
+                  </Text>
+                }
+                value={verifiedPayments}
+                prefix={<CheckCircleOutlined style={{ color: "#1890ff" }} />}
+                valueStyle={{ color: "#1890ff", fontSize: 28, fontWeight: 700 }}
+              />
+              <Text type="secondary" style={{ fontSize: 12, marginTop: 8 }}>
+                Out of {counts.payments} total
+              </Text>
+            </Card>
+          </Col>
+
+          <Col xs={24} sm={12} md={8}>
+            <Card
+              bordered={false}
+              style={{
+                borderRadius: 16,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              }}
+              bodyStyle={{ padding: 24 }}
+            >
+              <Statistic
+                title={
+                  <Text style={{ fontSize: 14, color: "#8c8c8c" }}>
+                    Pending Actions
+                  </Text>
+                }
+                value={pendingPayments}
+                prefix={<ClockCircleOutlined style={{ color: "#faad14" }} />}
+                valueStyle={{ color: "#faad14", fontSize: 28, fontWeight: 700 }}
+              />
+              <Text type="secondary" style={{ fontSize: 12, marginTop: 8 }}>
+                Requires attention
+              </Text>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Main Content */}
+        <Row gutter={[16, 16]}>
           {/* Upcoming Events */}
           <Col xs={24} lg={12}>
             <Card
-              bordered
-              style={{ borderRadius: 16 }}
-              bodyStyle={{ padding: 16 }}
+              bordered={false}
+              style={{
+                borderRadius: 16,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                height: "100%",
+              }}
+              bodyStyle={{ padding: 20 }}
             >
-              <Space style={{ justifyContent: "space-between", width: "100%" }}>
-                <Text style={{ fontSize: 16, fontWeight: 800 }}>
-                  Upcoming Events
-                </Text>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 16,
+                }}
+              >
+                <Space>
+                  <CalendarOutlined
+                    style={{ fontSize: 20, color: "#667eea" }}
+                  />
+                  <Text style={{ fontSize: 18, fontWeight: 700 }}>
+                    Upcoming Events
+                  </Text>
+                </Space>
                 <Button
                   type="link"
                   onClick={() => navigate("/events")}
-                  style={{ padding: 0, color: "#008cba" }}
+                  style={{ padding: 0, fontWeight: 600, color: "#008cba" }}
+                  icon={<ArrowRightOutlined />}
                 >
                   View all
                 </Button>
-              </Space>
+              </div>
 
-              <Divider style={{ margin: "12px 0" }} />
+              <Divider style={{ margin: "12px 0 16px" }} />
 
               {loading ? (
                 <Skeleton active paragraph={{ rows: 4 }} />
               ) : upcomingEvents.length === 0 ? (
-                <Empty description="No upcoming events" />
+                <Empty
+                  description="No upcoming events"
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
               ) : (
                 <List
                   itemLayout="horizontal"
                   dataSource={upcomingEvents}
                   renderItem={(item) => (
-                    <List.Item>
+                    <List.Item style={{ padding: "12px 0", border: "none" }}>
                       <List.Item.Meta
-                        avatar={<Avatar icon={<CalendarOutlined />} />}
-                        title={<Text strong>{item?.title || "Event"}</Text>}
-                        description={
-                          <Text type="secondary" style={{ fontSize: 12 }}>
-                            {formatDateRange(item?.startDate, item?.endDate)} •{" "}
-                            {item?.venue || "—"}
+                        avatar={
+                          <Avatar
+                            icon={<CalendarOutlined />}
+                            style={{ background: "#1890ff" }}
+                            size={44}
+                          />
+                        }
+                        title={
+                          <Text strong style={{ fontSize: 15 }}>
+                            {item?.title || "Event"}
                           </Text>
                         }
-                      />
-                      <Tag color={item?.isPublic ? "green" : "red"}>
-                        {item?.isPublic ? "Public" : "Private"}
-                      </Tag>
-                    </List.Item>
-                  )}
-                />
-              )}
-            </Card>
-          </Col>
-
-          {/* Recent Payments */}
-          <Col xs={24} lg={12}>
-            <Card
-              bordered
-              style={{ borderRadius: 16 }}
-              bodyStyle={{ padding: 16 }}
-            >
-              <Space style={{ justifyContent: "space-between", width: "100%" }}>
-                <Text style={{ fontSize: 16, fontWeight: 800 }}>
-                  Recent Payments
-                </Text>
-                <Button
-                  type="link"
-                  onClick={() => navigate("/payments")}
-                  style={{ padding: 0, color: "#008cba" }}
-                >
-                  View all
-                </Button>
-              </Space>
-
-              <Divider style={{ margin: "12px 0" }} />
-
-              {loading ? (
-                <Skeleton active paragraph={{ rows: 4 }} />
-              ) : recentPayments.length === 0 ? (
-                <Empty description="No payments found" />
-              ) : (
-                <List
-                  itemLayout="horizontal"
-                  dataSource={recentPayments}
-                  renderItem={(p) => (
-                    <List.Item>
-                      <List.Item.Meta
-                        avatar={<Avatar icon={<WalletOutlined />} />}
-                        title={
-                          <Space wrap>
-                            <Text strong>{p?.payerName || "Payment"}</Text>
-                            <Tag
-                              color={
-                                p?.status === "VERIFIED" ? "green" : "gold"
-                              }
-                            >
-                              {p?.status || "PENDING"}
-                            </Tag>
+                        description={
+                          <Space direction="vertical" size={4}>
+                            <Text type="secondary" style={{ fontSize: 13 }}>
+                              📅{" "}
+                              {formatDateRange(item?.startDate, item?.endDate)}
+                            </Text>
+                            <Text type="secondary" style={{ fontSize: 13 }}>
+                              📍 {item?.venue || "—"}
+                            </Text>
                           </Space>
                         }
-                        description={
-                          <Text type="secondary" style={{ fontSize: 12 }}>
-                            Amount: ₹{p?.amount ?? "—"} • {p?.paidOnDate || "—"}
-                          </Text>
-                        }
                       />
+                      <Tag
+                        color={item?.isPublic ? "success" : "default"}
+                        style={{ borderRadius: 8 }}
+                      >
+                        {item?.isPublic ? "Public" : "Private"}
+                      </Tag>
                     </List.Item>
                   )}
                 />
@@ -438,126 +495,75 @@ console.log("Rendering UserDashboard for", name);
           {/* Latest Blogs */}
           <Col xs={24} lg={12}>
             <Card
-              bordered
-              style={{ borderRadius: 16 }}
-              bodyStyle={{ padding: 16 }}
+              bordered={false}
+              style={{
+                borderRadius: 16,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                height: "100%",
+              }}
+              bodyStyle={{ padding: 20 }}
             >
-              <Space style={{ justifyContent: "space-between", width: "100%" }}>
-                <Text style={{ fontSize: 16, fontWeight: 800 }}>
-                  Latest Blogs
-                </Text>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 16,
+                }}
+              >
+                <Space>
+                  <ReadOutlined style={{ fontSize: 20, color: "#43e97b" }} />
+                  <Text style={{ fontSize: 18, fontWeight: 700 }}>
+                    Latest Blogs
+                  </Text>
+                </Space>
                 <Button
                   type="link"
                   onClick={() => navigate("/blogs")}
-                  style={{ padding: 0, color: "#008cba" }}
+                  style={{ padding: 0, fontWeight: 600 }}
+                  icon={<ArrowRightOutlined />}
                 >
                   View all
                 </Button>
-              </Space>
+              </div>
 
-              <Divider style={{ margin: "12px 0" }} />
+              <Divider style={{ margin: "12px 0 16px" }} />
 
               {loading ? (
                 <Skeleton active paragraph={{ rows: 4 }} />
               ) : latestBlogs.length === 0 ? (
-                <Empty description="No blogs available" />
+                <Empty
+                  description="No blogs available"
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
               ) : (
                 <List
                   itemLayout="horizontal"
                   dataSource={latestBlogs}
                   renderItem={(b) => (
-                    <List.Item>
+                    <List.Item style={{ padding: "12px 0", border: "none" }}>
                       <List.Item.Meta
-                        avatar={<Avatar icon={<ReadOutlined />} />}
-                        title={<Text strong>{b?.title || "Blog"}</Text>}
+                        avatar={
+                          <Avatar
+                            icon={<ReadOutlined />}
+                            style={{ background: "#722ed1" }}
+                            size={44}
+                          />
+                        }
+                        title={
+                          <Text strong style={{ fontSize: 15 }}>
+                            {b?.title || "Blog"}
+                          </Text>
+                        }
                         description={
-                          <Text type="secondary" style={{ fontSize: 12 }}>
-                            {b?.createdAt || b?.date || "—"}
+                          <Text type="secondary" style={{ fontSize: 13 }}>
+                            📝 {b?.createdAt || b?.date || "—"}
                           </Text>
                         }
                       />
                     </List.Item>
                   )}
                 />
-              )}
-            </Card>
-          </Col>
-
-          {/* Recent Gallery */}
-          <Col xs={24} lg={12}>
-            <Card
-              bordered
-              style={{ borderRadius: 16 }}
-              bodyStyle={{ padding: 16 }}
-            >
-              <Space style={{ justifyContent: "space-between", width: "100%" }}>
-                <Text style={{ fontSize: 16, fontWeight: 800 }}>
-                  Recent Gallery
-                </Text>
-                <Button
-                  type="link"
-                  onClick={() => navigate("/gallery")}
-                  style={{ padding: 0, color: "#008cba" }}
-                >
-                  View all
-                </Button>
-              </Space>
-
-              <Divider style={{ margin: "12px 0" }} />
-
-              {loading ? (
-                <Skeleton active paragraph={{ rows: 3 }} />
-              ) : galleryItems.length === 0 ? (
-                <Empty description="No gallery items" />
-              ) : (
-                <Row gutter={[8, 8]}>
-                  {galleryItems.map((g, idx) => (
-                    <Col xs={8} sm={6} md={6} key={g?.id || idx}>
-                      <div
-                        style={{
-                          width: "100%",
-                          aspectRatio: "1 / 1",
-                          borderRadius: 12,
-                          overflow: "hidden",
-                          border: "1px solid #E5E7EB",
-                          background: "#F3F4F6",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                        title={g?.title || "Image"}
-                      >
-                        <Image
-                          src={g?.imageUrl || g?.url || g?.photoUrl}
-                          alt={`Gallery: ${g?.title || "Untitled image"}`}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                          preview={false}
-                          fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNFNUU3RUIiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzkwOTdBMSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlBob3RvPC90ZXh0Pjwvc3ZnPg=="
-                          placeholder={
-                            <div
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                background: "#f5f5f5",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                              }}
-                            >
-                              <PictureOutlined
-                                style={{ fontSize: 32, color: "#ccc" }}
-                              />
-                            </div>
-                          }
-                        />
-                      </div>
-                    </Col>
-                  ))}
-                </Row>
               )}
             </Card>
           </Col>

@@ -15,6 +15,7 @@ import {
   Dropdown,
   Avatar,
   Divider,
+  Upload,
 } from "antd";
 import {
   MenuUnfoldOutlined,
@@ -24,10 +25,12 @@ import {
   LogoutOutlined,
   ProfileOutlined,
   GiftOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import {MdLogout} from "react-icons/md";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import SirivaramLogo from "../components/SirivaramLogo";
+import axios from "axios";
 
 import { FaImages, FaHome, FaNewspaper } from "react-icons/fa";
 import { FaCalendarAlt, FaClock, FaCreditCard } from "react-icons/fa";
@@ -59,6 +62,7 @@ export default function UserPanelLayout({ children }) {
   // ✅ edit modal
   const [editOpen, setEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [form] = Form.useForm();
 
   // ✅ xs: collapse, md+: expand
@@ -113,8 +117,34 @@ export default function UserPanelLayout({ children }) {
       name: safeStr(current.name),
       address: safeStr(current.address),
       village: safeStr(current.village),
+      imageUrl: safeStr(current.imageUrl),
     });
     setEditOpen(true);
+  };
+
+  // ✅ Image upload handler
+  const handleImageUpload = async (file) => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await axios.post(
+        "https://api.imgbb.com/1/upload?key=f5435f6feb6a01f1128a892cd748a25c",
+        formData
+      );
+      const url = res?.data?.data?.url || res?.data?.data?.display_url;
+      if (url) {
+        form.setFieldsValue({ imageUrl: url });
+        message.success("Image uploaded successfully!");
+      } else {
+        message.error("Upload failed - no URL returned");
+      }
+    } catch (err) {
+      message.error(err.message || "Image upload failed");
+    } finally {
+      setUploading(false);
+    }
+    return false;
   };
 
   // ✅ PUT /api/users/me
@@ -127,6 +157,7 @@ export default function UserPanelLayout({ children }) {
         name: safeStr(values.name).trim(),
         address: safeStr(values.address).trim(),
         village: safeStr(values.village).trim(),
+        imageUrl: safeStr(values.imageUrl).trim(),
       };
 
       const res = await fetch(`${API_BASE}/api/users/me`, {
@@ -549,7 +580,7 @@ export default function UserPanelLayout({ children }) {
             marginLeft: screens.xs ? 0 : leftWidth,
           }}
         >
-          Sirivaram Village ©{fullYear} | User Portal
+          Sirivaram Village ©{new Date().getFullYear()}
         </Footer>
       </Layout>
 
@@ -623,6 +654,25 @@ export default function UserPanelLayout({ children }) {
                   allowClear
                 />
               </Form.Item>
+            </Col>
+
+            <Col xs={24}>
+              <Form.Item label="Profile Image" name="imageUrl">
+                <Input placeholder="Image URL" allowClear disabled />
+              </Form.Item>
+              <Upload
+                beforeUpload={handleImageUpload}
+                showUploadList={false}
+                accept="image/*"
+              >
+                <Button
+                  icon={<UploadOutlined />}
+                  loading={uploading}
+                  style={{ marginTop: -10 }}
+                >
+                  {uploading ? "Uploading..." : "Upload Image"}
+                </Button>
+              </Upload>
             </Col>
           </Row>
         </Form>

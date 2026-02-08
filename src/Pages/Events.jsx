@@ -67,6 +67,7 @@ export default function Events() {
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   const [visibility, setVisibility] = useState("all");
+  const [yearFilter, setYearFilter] = useState("all");
   const [sortBy, setSortBy] = useState("startDesc");
 
   // QR modal
@@ -151,6 +152,10 @@ export default function Events() {
       list = list.filter((e) => !!e.isPublic === wantPublic);
     }
 
+    if (yearFilter !== "all") {
+      list = list.filter((e) => e.year === Number(yearFilter));
+    }
+
     if (debouncedQ) {
       list = list.filter((e) => {
         const t = (e.title || "").toLowerCase();
@@ -171,7 +176,12 @@ export default function Events() {
     });
 
     return list;
-  }, [events, visibility, sortBy, debouncedQ]);
+  }, [events, visibility, yearFilter, sortBy, debouncedQ]);
+
+  const availableYears = useMemo(() => {
+    const years = [...new Set(events.map((e) => e.year).filter(Boolean))];
+    return years.sort((a, b) => b - a);
+  }, [events]);
 
   const openQr = (url) => {
     if (!url) return;
@@ -336,7 +346,7 @@ export default function Events() {
 
           {/* Filters */}
           <Row gutter={[12, 12]} align="middle">
-            <Col xs={24} md={12}>
+            <Col xs={24} sm={24} md={12}>
               <Input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
@@ -347,11 +357,11 @@ export default function Events() {
               />
             </Col>
 
-            <Col xs={12} md={6}>
+            <Col xs={12} sm={8} md={4}>
               <Select
                 value={visibility}
                 onChange={setVisibility}
-                style={{ width: "100%" }}
+                style={{ width: "100%", height: 40 }}
                 options={[
                   { value: "all", label: "All" },
                   { value: "public", label: "Public" },
@@ -360,17 +370,19 @@ export default function Events() {
               />
             </Col>
 
-            <Col xs={12} md={6}>
+            <Col xs={12} sm={8} md={4}>
               <Select
-                value={sortBy}
-                onChange={setSortBy}
-                style={{ width: "100%" }}
+                value={yearFilter}
+                onChange={setYearFilter}
+                style={{ width: "100%", height: 40 }}
                 options={[
-                  { value: "startDesc", label: "Recent first" },
-                  { value: "startAsc", label: "Oldest first" },
+                  { value: "all", label: "All Years" },
+                  ...availableYears.map((y) => ({ value: String(y), label: String(y) })),
                 ]}
               />
             </Col>
+
+          
           </Row>
         </Card>
 
@@ -431,40 +443,40 @@ export default function Events() {
                     <Card
                       hoverable
                       style={{
-                        borderRadius: 18,
+                        borderRadius: 16,
                         height: "100%",
-                        boxShadow: "0 6px 18px rgba(0,0,0,0.05)",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                        border: "1px solid #f0f0f0",
                       }}
-                      bodyStyle={{ padding: 16 }}
+                      bodyStyle={{ padding: 20 }}
                     >
                       <Space
                         direction="vertical"
-                        size={10}
+                        size={14}
                         style={{ width: "100%" }}
                       >
-                        {/* Title & Tags */}
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            gap: 10,
-                          }}
-                        >
-                          <div style={{ minWidth: 0 }}>
-                            <Text
-                              style={{ fontSize: 16, fontWeight: 800 }}
-                              ellipsis
+                        {/* Header with Title and Status */}
+                        <div>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
+                              marginBottom: 8,
+                            }}
+                          >
+                            <Title
+                              level={5}
+                              style={{
+                                margin: 0,
+                                fontSize: 17,
+                                fontWeight: 700,
+                                flex: 1,
+                              }}
+                              ellipsis={{ rows: 2 }}
                             >
                               {e.title || "Event"}
-                            </Text>
-                            <Text type="secondary" style={{ fontSize: 12 }}>
-                              {dayjs(e.startDate).format("DD MMM YYYY")}
-                              {e.endDate &&
-                                ` - ${dayjs(e.endDate).format("DD MMM YYYY")}`}
-                            </Text>
-                          </div>
-
-                          <Space direction="vertical" size={4}>
+                            </Title>
                             <Tag
                               icon={
                                 e.isPublic ? (
@@ -473,114 +485,131 @@ export default function Events() {
                                   <LockOutlined />
                                 )
                               }
-                              color={e.isPublic ? "green" : "red"}
-                              style={{ margin: 0, borderRadius: 999 }}
+                              color={e.isPublic ? "success" : "error"}
+                              style={{ margin: 0, borderRadius: 8 }}
                             >
                               {e.isPublic ? "Public" : "Private"}
                             </Tag>
-                            <Tag
-                              color={
-                                dayjs(e.startDate).isAfter(dayjs())
-                                  ? "blue"
-                                  : "orange"
-                              }
-                              style={{ borderRadius: 999 }}
-                            >
-                              {dayjs(e.startDate).isAfter(dayjs())
-                                ? "Upcoming"
-                                : "Past"}
-                            </Tag>
-                          </Space>
-                        </div>
+                          </div>
 
-                        {/* Description */}
-                        <Text type="secondary" style={{ fontSize: 13 }}>
-                          {(e.description || "—").length > 130
-                            ? `${(e.description || "—").slice(0, 130)}...`
-                            : e.description || "—"}
-                        </Text>
-
-                        {/* Info */}
-                        <Space size={8} wrap>
-                          <Space size={6}>
-                            <EnvironmentOutlined style={{ color: "#6B7280" }} />
-                            <Text style={{ fontSize: 13 }}>
-                              <b>Venue:</b> {e.venue || "—"}
+                          {/* Date Range Display */}
+                          <Space size={4} style={{ marginBottom: 4 }}>
+                            <CalendarOutlined
+                              style={{ color: "#1890ff", fontSize: 14 }}
+                            />
+                            <Text strong style={{ fontSize: 14, color: "#1890ff" }}>
+                              {dayjs(e.startDate).format("DD MMM YYYY")}
+                              {e.endDate &&
+                                dayjs(e.endDate).format("YYYYMMDD") !==
+                                  dayjs(e.startDate).format("YYYYMMDD") &&
+                                ` - ${dayjs(e.endDate).format("DD MMM YYYY")}`}
                             </Text>
                           </Space>
-                          <Space size={6}>
-                            <WalletOutlined style={{ color: "#6B7280" }} />
+
+                          {/* Event Status Tag */}
+                          <Tag
+                            color={
+                              dayjs(e.startDate).isAfter(dayjs())
+                                ? "processing"
+                                : "default"
+                            }
+                            style={{ borderRadius: 8, fontSize: 12 }}
+                          >
+                            {dayjs(e.startDate).isAfter(dayjs())
+                              ? "🎉 Upcoming"
+                              : "📅 Past Event"}
+                          </Tag>
+                        </div>
+
+                        <Divider style={{ margin: 0 }} />
+
+                        {/* Description */}
+                        <Text
+                          type="secondary"
+                          style={{
+                            fontSize: 13,
+                            lineHeight: 1.6,
+                            display: "block",
+                            minHeight: 60,
+                          }}
+                        >
+                          {(e.description || "No description available").length > 120
+                            ? `${(e.description || "No description available").slice(0, 120)}...`
+                            : e.description || "No description available"}
+                        </Text>
+
+                        {/* Venue and Price Info */}
+                        <Space direction="vertical" size={8} style={{ width: "100%" }}>
+                          <Space size={8}>
+                            <EnvironmentOutlined
+                              style={{ color: "#52c41a", fontSize: 16 }}
+                            />
                             <Text style={{ fontSize: 13 }}>
-                              <b>Ticket:</b> {formatTicketPrice(e.ticketPrice)}
+                              <Text strong>Venue:</Text> {e.venue || "TBA"}
+                            </Text>
+                          </Space>
+                          <Space size={8}>
+                            <WalletOutlined
+                              style={{ color: "#faad14", fontSize: 16 }}
+                            />
+                            <Text style={{ fontSize: 13 }}>
+                              <Text strong>Price:</Text> {formatTicketPrice(e.ticketPrice)}
                             </Text>
                           </Space>
                         </Space>
 
-                        {/* Footer */}
+                        <Divider style={{ margin: 0 }} />
+
+                        {/* Action Buttons */}
                         <div
                           style={{
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
-                            marginTop: 6,
+                            flexWrap: "wrap",
+                            gap: 8,
                           }}
                         >
-                          <Tag
-                            icon={<CalendarOutlined />}
-                            color="blue"
-                            style={{ borderRadius: 999 }}
-                          >
-                            {dayjs(e.startDate).isValid()
-                              ? dayjs(e.startDate).format("ddd, DD MMM")
-                              : "—"}
-                          </Tag>
-
-                          <Space>
-                           
-
+                          <Space size={8}>
                             {getStatusDisplay(userPayment)}
 
                             {showPayButton && (
                               <Button
+                                type="primary"
                                 icon={<CreditCardOutlined />}
                                 onClick={() => openPayModal(e)}
                                 style={{
-                                  borderRadius: 10,
+                                  borderRadius: 8,
                                   background: BTN_GREEN,
                                   borderColor: BTN_GREEN,
-                                  color: "#fff",
-                                  fontWeight: 700,
+                                  fontWeight: 600,
                                 }}
+                                size="small"
                               >
-                                Pay
+                                Pay Now
                               </Button>
                             )}
-
-                            <Tooltip
-                              title={
-                                e.qrImageUrl ? "View QR" : "No QR available"
-                              }
-                            >
-                              <Button
-                                disabled={!e.qrImageUrl}
-                                icon={<QrcodeOutlined />}
-                                onClick={() => openQr(e.qrImageUrl)}
-                                style={{
-                                  borderRadius: 10,
-                                  background: e.qrImageUrl
-                                    ? BTN_BLUE
-                                    : "#e5e7eb",
-                                  borderColor: e.qrImageUrl
-                                    ? BTN_BLUE
-                                    : "#e5e7eb",
-                                  color: e.qrImageUrl ? "#fff" : "#6b7280",
-                                  fontWeight: 700,
-                                }}
-                              >
-                                QR
-                              </Button>
-                            </Tooltip>
                           </Space>
+
+                          <Tooltip
+                            title={e.qrImageUrl ? "View QR Code" : "No QR available"}
+                          >
+                            <Button
+                              disabled={!e.qrImageUrl}
+                              icon={<QrcodeOutlined />}
+                              onClick={() => openQr(e.qrImageUrl)}
+                              style={{
+                                borderRadius: 8,
+                                background: e.qrImageUrl ? BTN_BLUE : "#f5f5f5",
+                                borderColor: e.qrImageUrl ? BTN_BLUE : "#d9d9d9",
+                                color: e.qrImageUrl ? "#fff" : "#bfbfbf",
+                                fontWeight: 600,
+                              }}
+                              size="small"
+                            >
+                              QR Code
+                            </Button>
+                          </Tooltip>
                         </div>
                       </Space>
                     </Card>

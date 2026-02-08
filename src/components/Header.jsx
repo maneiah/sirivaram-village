@@ -5,10 +5,24 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
   const firstMobileLinkRef = useRef(null);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkAuth = () => {
+      const userId = sessionStorage.getItem("userId") || localStorage.getItem("userId");
+      const token = localStorage.getItem("token");
+      setIsLoggedIn(!!(userId && token));
+    };
+    
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
+  }, [location]);
 
   // Shadow + blur after scroll
   useEffect(() => {
@@ -100,6 +114,21 @@ export default function Header() {
 
   const mobileLinkClass = (isActive) =>
     `block px-4 py-3 rounded-xl transition-colors text-lg ${isActive ? mobileActive : mobileLinkBase}`;
+
+  const handleAuthClick = () => {
+    if (isLoggedIn) {
+      navigate("/dashboard");
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    setIsLoggedIn(false);
+    navigate("/");
+  };
 
   return (
     <header
@@ -232,23 +261,46 @@ export default function Header() {
               Contact
             </Link>
 
-            <Link
-              to="/login"
-              className={navItemClass(location.pathname === "/login")}
-            >
-              Login
-            </Link>
+            {!isLoggedIn ? (
+              <>
+                <Link
+                  to="/login"
+                  className={navItemClass(location.pathname === "/login")}
+                >
+                  Login
+                </Link>
 
-            <Link
-              to="/register"
-              className={`px-5 py-2 rounded-xl font-semibold transition-all ${
-                isScrolled
-                  ? "bg-white text-amber-900 hover:bg-amber-50"
-                  : "bg-amber-800 text-white hover:bg-amber-900"
-              }`}
-            >
-              Register
-            </Link>
+                <Link
+                  to="/register"
+                  className={`px-5 py-2 rounded-xl font-semibold transition-all ${
+                    isScrolled
+                      ? "bg-white text-amber-900 hover:bg-amber-50"
+                      : "bg-amber-800 text-white hover:bg-amber-900"
+                  }`}
+                >
+                  Register
+                </Link>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleAuthClick}
+                  className={`px-5 py-2 rounded-xl font-semibold transition-all ${
+                    isScrolled
+                      ? "bg-white text-amber-900 hover:bg-amber-50"
+                      : "bg-amber-800 text-white hover:bg-amber-900"
+                  }`}
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className={navItemClass(false)}
+                >
+                  Logout
+                </button>
+              </>
+            )}
           </nav>
 
           {/* MOBILE MENU BUTTON (toggles open/close) */}
@@ -333,25 +385,54 @@ export default function Header() {
 
               <div className={`h-px ${mobileDivider} my-4`} />
 
-              <Link
-                to="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={mobileLinkClass(location.pathname === "/login")}
-              >
-                Login
-              </Link>
+              {!isLoggedIn ? (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={mobileLinkClass(location.pathname === "/login")}
+                  >
+                    Login
+                  </Link>
 
-              <Link
-                to="/register"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`block px-6 py-3 mt-2 rounded-xl font-semibold text-center transition-all ${
-                  isScrolled
-                    ? "bg-white text-amber-950 hover:bg-amber-50"
-                    : "bg-amber-800 text-white hover:bg-amber-900"
-                }`}
-              >
-                Register
-              </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`block px-6 py-3 mt-2 rounded-xl font-semibold text-center transition-all ${
+                      isScrolled
+                        ? "bg-white text-amber-950 hover:bg-amber-50"
+                        : "bg-amber-800 text-white hover:bg-amber-900"
+                    }`}
+                  >
+                    Register
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleAuthClick();
+                    }}
+                    className={`block w-full px-6 py-3 mt-2 rounded-xl font-semibold text-center transition-all ${
+                      isScrolled
+                        ? "bg-white text-amber-950 hover:bg-amber-50"
+                        : "bg-amber-800 text-white hover:bg-amber-900"
+                    }`}
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className={mobileLinkClass(false)}
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
             </nav>
           </div>
         </div>
